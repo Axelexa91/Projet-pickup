@@ -1,4 +1,5 @@
-# Projet-pickup
-Le projet de la muerta
+# Projet-pickup (Partie Principal)
 
-azertyuio
+C'est ici que se trouve le projet dans son ensemble.
+
+# NE JAMAIS MODIFIER ICI DIRECTEMENT, MODIFIER DANS VOS BRANCHES RESPECTIVES
