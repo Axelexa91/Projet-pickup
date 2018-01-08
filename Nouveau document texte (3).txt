@@ -1,0 +1,156 @@
+Option Explicit
+
+'SOURCES :
+    'Manipuler IE depuis VBA :
+    'http://qwazerty.developpez.com/tutoriels/vba/ie-et-vba-excel/
+    
+    'Sendkeys & Vider_Presse_Papier : MichDenis
+    'http://www.generation-nt.com/reponses/pb-avec-sendkeys-ctrl-plusa-ctrl-plusc-ctrl-plusv-entraide-3545931.html
+    
+'REFERENCES :
+    'Pour manipuler IE, il nous faudra activer deux références :
+        '« Microsoft Internet Controls »
+        '« Microsoft HTML Object Library ».
+    'Pour accéder aux références dans VBA, menu Outils -> Références.
+    
+Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+Private Declare Function OpenClipboard Lib "user32" (ByVal hwnd As Long) As Long
+Private Declare Function EmptyClipboard Lib "user32" () As Long
+Private Declare Function CloseClipboard Lib "user32" () As Long
+
+Dim Trouve As Boolean
+
+Sub VaChercherSurInternet(Site As String, Ville As String, Annee As String)
+Dim IE As New InternetExplorer
+Dim IEDoc As HTMLDocument
+Dim htmlTagCol As IHTMLElementCollection
+Dim Lien As String, MsgErreur As String
+
+Vider_Presse_Papier
+
+'Ouvre Internet Explorer à la page référencée en B1 et B2
+IE.navigate Site
+IE.Visible = True
+
+WaitIE IE
+
+Set IEDoc = IE.document
+Set htmlTagCol = IEDoc.getElementsByTagName("a")
+
+'Boucle sur tous les liens et clic sur celui de la première lettre de la ville référencée en B3
+Lien = Left(Ville, 1)
+Trouve = False
+Clic_Sur_Lien htmlTagCol, Lien, IE
+
+'Traitement si la première lettre n'est pas trouvée dans les liens
+If Trouve = False Then
+    MsgErreur = Left(Ville, 1) & " non trouvée dans les liens du site : " & Site
+    GoTo ErreurUrl
+End If
+
+Set IEDoc = IE.document
+Set htmlTagCol = IEDoc.getElementsByTagName("a")
+'Boucle sur tous les liens et clic sur celui de la ville référencée en B3
+Lien = "*" & Ville & "*"
+Trouve = False
+Clic_Sur_Lien htmlTagCol, Lien, IE
+
+'Traitement si la ville n'est pas trouvée dans les liens
+If Trouve = False Then
+    MsgErreur = "Ville " & Ville & " non trouvée."
+    GoTo ErreurUrl
+End If
+
+Set IEDoc = IE.document
+Set htmlTagCol = IEDoc.getElementsByTagName("a")
+'Boucle sur tous les liens et clic sur celui de la ville référencée en B3 + "Budget principal"
+Lien = "*" & Ville & "*" & "(Budget principal" & "*"
+Trouve = False
+Clic_Sur_Lien htmlTagCol, Lien, IE
+
+'Traitement si budget prinicpal n'est pas trouvée dans les liens
+If Trouve = False Then
+    MsgErreur = "Le lien budget principal de la ville " & Ville & " n'a pas été trouvé."
+    GoTo ErreurUrl
+End If
+
+Set IEDoc = IE.document
+Set htmlTagCol = IEDoc.getElementsByTagName("a")
+'Boucle sur tous les liens et clic sur celui de l'année référencée en B4
+Lien = Annee
+Trouve = False
+Clic_Sur_Lien htmlTagCol, Lien, IE
+
+'Traitement si l'année n'est pas trouvée dans les liens
+If Trouve = False Then
+    MsgErreur = "Le lien budget principal de la ville " & Ville & " pour l'année : " & Annee & " n'a pas été trouvé."
+    GoTo ErreurUrl
+End If
+
+Set IEDoc = IE.document
+Set htmlTagCol = IEDoc.getElementsByTagName("a")
+'Boucle sur tous les liens et clic sur "Fiche détaillée"
+Lien = "Fiche détaillée"
+Trouve = False
+Clic_Sur_Lien htmlTagCol, Lien, IE
+
+'Traitement si la fiche n'est pas trouvée dans les liens
+If Trouve = False Then
+    MsgErreur = "La fiche détaillée du budget de la ville " & Ville & " pour l'année : " & Annee & " n'a pas été trouvé."
+    GoTo ErreurUrl
+End If
+
+Application.SendKeys "^a"
+Application.Wait Now + TimeValue("00:00:01")
+Application.SendKeys "^c"
+Application.Wait Now + TimeValue("00:00:01")
+With Sheets("Feuil2")
+    .Select
+    .Cells.Delete 'suppression de toutes les lignes de la feuille!!!!!
+    .Range("A1").Select 
+    .Paste
+End With
+
+IE.Quit
+
+Set IE = Nothing
+Set IEDoc = Nothing
+Set htmlTagCol = Nothing
+
+Vider_Presse_Papier
+
+MsgBox "Importation terminée avec succès.", vbInformation
+
+Exit Sub
+
+ErreurUrl:
+MsgBox MsgErreur
+End Sub
+
+Function Clic_Sur_Lien(CollectionLiens As IHTMLElementCollection, Lien As String, IE As InternetExplorer)
+Dim mesLiens As IHTMLElement, Attente As Long
+If Sheets("Feuil1").Range("B5").Value = "" Then Sheets("Feuil1").Range("B5").Value = 2
+Attente = CLng(Sheets("Feuil1").Range("B5").Value) * 1000
+For Each mesLiens In CollectionLiens
+    If mesLiens.innerText Like Lien Then
+        mesLiens.Click
+        Trouve = True
+    End If
+    If Trouve Then Exit For
+Next
+Sleep Attente
+WaitIE IE
+End Function
+
+Sub WaitIE(IE As InternetExplorer)
+   'On boucle tant que la page n'est pas totalement chargée
+   Do Until IE.readyState = READYSTATE_COMPLETE
+      DoEvents
+   Loop
+End Sub
+
+Sub Vider_Presse_Papier()
+OpenClipboard 0
+EmptyClipboard
+CloseClipboard
+End Sub
