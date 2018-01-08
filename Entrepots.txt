@@ -1,0 +1,4 @@
+000;Stock0.txt;
+001;Stock1.txt;
+002;Stock2.txt;
+003;Stock3.txt;

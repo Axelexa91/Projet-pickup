@@ -1,0 +1,6 @@
+000;Pickup0.txt;
+001;Pickup1.txt;
+002;Pickup2.txt;
+003;Pickup3.txt;
+004;Pickup4.txt;
+005;Pickup5.txt;
