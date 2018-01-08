@@ -1,5 +1,5 @@
-# Projet-pickup (Partie Organisation)
+# Projet-pickup (Partie Principale)
 
-C'est ici que se trouve toutes les ressources permettant l'organistion du projet, documents textes, paint, word, etc...
+C'est ici que se trouve le principal du projet
 
-# UNIQUEMENT SUR APPROBATION DES CHEFS DE PROJET
+# NE JAMAIS MODIFIER DIRECTEMENT, TOUJOURS MODIFIER DANS VOS PROPRES BRANCHES
