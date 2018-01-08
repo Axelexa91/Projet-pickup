@@ -1,0 +1,6 @@
+0001;Aile de poulet frit;Frit avec amour;Poulet;
+0002;Rôti d'autruche;Vieille recette;Autruche;
+0003;Concombre frit;Produit original;Végétarien;
+0004;Salade Ceasar;Pour les vegans;Végétarien;
+0005;Poignet de porte;Pour collection;Bizarre;
+0006;Pâte de poulet;Menu thai;Poulet;
