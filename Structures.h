@@ -9,20 +9,20 @@
 /*La structure qui défini un client (UNE LIGNE) */ 
 typedef struct Client {	
 	int ID;								//4 chiffres pour l'ID
-	char Nom[21];						//Nom de 20 caractère alpha ( +1 pour le \0 de fin de chaine de caractère )
-	char Prenom[21];					//Prenom de 20 caractère alpha ( +1 pour \0 de fin de chaine de caractère)
-	char Adresse[51];					//localisation ( adresse ) du client, 50 caractères ( +1 pour \0 de fin de chainede caractère )
-	char Ville[21];						//La ville du client (+1 pour le \0)
-	char CodePostal[6];					//Code postal du client 5 chiffres + le \0
-	char NumeroTel[11];					//numéro de téléphone, 10 chiffres dit caractère numérique ( et PAS alphanumérique ) (+1 pour le \0 de fin de chaine de caractère )
-	char MotDePasse[5];					//Mot de passe de 4 caractère alphanumérique (+1 pour le \0à de fin de chaine de caractère)
+	char Nom[CLIENT_NOM_MAX];						//Nom de 20 caractère alpha ( +1 pour le \0 de fin de chaine de caractère )
+	char Prenom[CLIENT_PRENOM_MAX];					//Prenom de 20 caractère alpha ( +1 pour \0 de fin de chaine de caractère)
+	char Adresse[CLIENT_ADRESSE_MAX];					//localisation ( adresse ) du client, 50 caractères ( +1 pour \0 de fin de chainede caractère )
+	char Ville[CLIENT_VILLE_MAX];						//La ville du client (+1 pour le \0)
+	char CodePostal[CLIENT_CodePostal_MAX];					//Code postal du client 5 chiffres + le \0
+	char NumeroTel[CLIENT_TELEPHONE_MAX];					//numéro de téléphone, 10 chiffres dit caractère numérique ( et PAS alphanumérique ) (+1 pour le \0 de fin de chaine de caractère )
+	char MotDePasse[CLIENT_MotDePasse_MAX];					//Mot de passe de 4 caractère alphanumérique (+1 pour le \0à de fin de chaine de caractère)
 } Client;
 
 /*La structure qui regroupe tous les clients (UN FICHIER) */
 typedef struct ClientSeul  //Déclaration d'un élément individuel de la liste
 {
 	Client client;  
-struct ClientSeul *next;  //On définit un pointeur sur l'élément suivant
+	struct ClientSeul *next;  //On définit un pointeur sur l'élément suivant
 }ClientSeul;
 
 typedef struct ListeClient //Déclaration de la liste en elle-même avec une tête de liste, une queue de liste et la taille de la liste
@@ -44,9 +44,9 @@ typedef struct ClientFile
 /*La structure qui definit un Article (UNE LIGNE) */
 typedef struct Article {
 	int ID;								//4 chiffres pour l'ID
-	char Nom[21];						//Nom de l'article de 20 caractère ( +1 pour le \0 de fin de chaine de caractère )
-	char Description[21];				//Description de l'article de 20 caractère de long ( +1 pour le \0 de fin de chaine de caractère )
-	char Type[21];						//Type de l'article de 20 caractère de long
+	char Nom[ARTICLE_NOM_MAX];						//Nom de l'article de 20 caractère ( +1 pour le \0 de fin de chaine de caractère )
+	char Description[ARTICLE_DESCRIPTION_MAX];				//Description de l'article de 20 caractère de long ( +1 pour le \0 de fin de chaine de caractère )
+	char Type[ARTICLE_TYPE_MAX];						//Type de l'article de 20 caractère de long
 } Article;
 /*La structure qui regroupe tous les articles défini (UN FICHIER) */
 typedef struct ArticleFile {	
@@ -91,7 +91,7 @@ typedef struct ArticleStocksFile {
 /*structure qui defini un entrepot (le dossier ou il faut aller voir son stock) (UNE LIGNE) */
 typedef struct Entrepot {
 	int EntrepotID;					//ID de l'entrepot
-	char NomDuDossier[16];			//Nom du dossier dans lequel se trouve le dossier stock de cet entrepot
+	char NomDuDossier[ENTREPOT_NOM_DOSSIER_MAX];			//Nom du dossier dans lequel se trouve le dossier stock de cet entrepot
 } Entrepot;
 /*structure qui contient tous les emplacements des dossier des entrepots (UN FICHIER) */
 typedef struct EntrepotFile {
