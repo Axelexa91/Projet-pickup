@@ -6,23 +6,37 @@
 /*                          DONNEES STOCKEES                          */
 /*--------------------------------------------------------------------*/
 
-/*La structure qui défini un client (UNE LIGNE) */ 
+/*La structure qui dÃ©fini un client (UNE LIGNE) */ 
 typedef struct Client {	
 	int ID;								//4 chiffres pour l'ID
-	char Nom[21];						//Nom de 20 caractère alpha ( +1 pour le \0 de fin de chaine de caractère )
-	char Prenom[21];					//Prenom de 20 caractère alpha ( +1 pour \0 de fin de chaine de caractère)
-	char Adresse[51];					//localisation ( adresse ) du client, 50 caractères ( +1 pour \0 de fin de chainede caractère )
+	char Nom[21];						//Nom de 20 caractÃ¨re alpha ( +1 pour le \0 de fin de chaine de caractÃ¨re )
+	char Prenom[21];					//Prenom de 20 caractÃ¨re alpha ( +1 pour \0 de fin de chaine de caractÃ¨re)
+	char Adresse[51];					//localisation ( adresse ) du client, 50 caractÃ¨res ( +1 pour \0 de fin de chainede caractÃ¨re )
 	char Ville[21];						//La ville du client (+1 pour le \0)
 	char CodePostal[6];					//Code postal du client 5 chiffres + le \0
-	char NumeroTel[11];					//numéro de téléphone, 10 chiffres dit caractère numérique ( et PAS alphanumérique ) (+1 pour le \0 de fin de chaine de caractère )
-	char MotDePasse[5];					//Mot de passe de 4 caractère alphanumérique (+1 pour le \0à de fin de chaine de caractère)
+	char NumeroTel[11];					//numÃ©ro de tÃ©lÃ©phone, 10 chiffres dit caractÃ¨re numÃ©rique ( et PAS alphanumÃ©rique ) (+1 pour le \0 de fin de chaine de caractÃ¨re )
+	char MotDePasse[5];					//Mot de passe de 4 caractÃ¨re alphanumÃ©rique (+1 pour le \0Ã  de fin de chaine de caractÃ¨re)
 } Client;
 /*La structure qui regroupe tous les clients (UN FICHIER) */
-typedef struct ClientFile {
-	Client *TableauDeClient;			//Un pointeur sur un tableau de Client (Nécéssite un malloc et des realloc)
-	int NombreDeClients;				//Nombre de client enregistrer pour le moment
+typedef struct ClientSeul  //DÃ©claration d'un Ã©lÃ©ment individuel de la liste
+{
+	Client client;  
+	struct ClientSeul *next;  //On dÃ©finit un pointeur sur l'Ã©lÃ©ment suivant
+}ClientSeul;
 
+typedef struct ListeClient //DÃ©claration de la liste en elle-mÃªme avec une tÃªte de liste, une queue de liste et la taille de la liste
+{
+	ClientSeul *head;
+	int size;
+	ClientSeul *tail;
+}ListeClient;
+
+typedef struct ClientFile
+{
+	int NombreDeClient;
+	ListeClient *BDDclient;
 } ClientFile;
+
 
 
 
@@ -31,11 +45,11 @@ typedef struct ClientFile {
 /*La structure qui definit un Article (UNE LIGNE) */
 typedef struct Article {
 	int ID;								//4 chiffres pour l'ID
-	char Nom[21];						//Nom de l'article de 20 caractère ( +1 pour le \0 de fin de chaine de caractère )
-	char Description[21];				//Description de l'article de 20 caractère de long ( +1 pour le \0 de fin de chaine de caractère )
-	char Type[21];						//Type de l'article de 20 caractère de long
+	char Nom[21];						//Nom de l'article de 20 caractÃ¨re ( +1 pour le \0 de fin de chaine de caractÃ¨re )
+	char Description[21];				//Description de l'article de 20 caractÃ¨re de long ( +1 pour le \0 de fin de chaine de caractÃ¨re )
+	char Type[21];						//Type de l'article de 20 caractÃ¨re de long
 } Article;
-/*La structure qui regroupe tous les articles défini (UN FICHIER) */
+/*La structure qui regroupe tous les articles dÃ©fini (UN FICHIER) */
 typedef struct ArticleFile {	
 	Article *TableauDesArticles;		//Un pointeur sur un tableau d'article (Necessite un malloc et des realloc)
 	int NombreArticles;					//Nombre d'article dans ce fichier d'article
@@ -48,7 +62,7 @@ typedef struct ArticleFile {
 typedef struct Commande {
 	int ClientID;						//L'ID du client qui passe la commande
 	int ArticleID;						//L'ID de l'article que le client a commander
-	int Quantity;						//La quantité de c et article que le client à commander
+	int Quantity;						//La quantitÃ© de c et article que le client Ã  commander
 	int CodeRetrait;					//Le code que le client doit taper afin de retirer son colis dans les pickup Station
 } Commande;
 /*La structure qui regroupe toutes les commandes (UN FICHIER) */
@@ -60,16 +74,16 @@ typedef struct CommandeFile {
 
 
 
-/*strucutre qui défini les stocks d'un article dans un entrepot (UNE LIGNE) */
+/*strucutre qui dÃ©fini les stocks d'un article dans un entrepot (UNE LIGNE) */
 typedef struct ArticleStocks {
 	int EntrepotID;					//ID de l'entrepot (USELESS)
 	int ArticleID;					//ID de l'article
-	int Quantity;					//Quantité en stock de cet article
+	int Quantity;					//QuantitÃ© en stock de cet article
 	int Hauteur;					//Hauteur de l'article	
 	int Largeur;					//Largeur de l'article
 	int Profondeur;					//Profondeur de l'article
 } ArticleStocks;
-/*structure qui defini tous les article stockées dans un entrepot (UN FICHIER) */
+/*structure qui defini tous les article stockÃ©es dans un entrepot (UN FICHIER) */
 typedef struct StocksEntrepot {
 	ArticleStocks *TabArticleStock;	//Un pointeur qui pointe sur un tableau qui liste tous les articles en stocks dans CET entrepot
 	int NombreArticle;				//Le nombre d'article DIFFERENT en stock
