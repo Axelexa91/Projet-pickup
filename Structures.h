@@ -17,41 +17,25 @@ typedef struct Client {
 	char NumeroTel[11];					//numéro de téléphone, 10 chiffres dit caractère numérique ( et PAS alphanumérique ) (+1 pour le \0 de fin de chaine de caractère )
 	char MotDePasse[5];					//Mot de passe de 4 caractère alphanumérique (+1 pour le \0à de fin de chaine de caractère)
 } Client;
+
 /*La structure qui regroupe tous les clients (UN FICHIER) */
 typedef struct ClientSeul  //Déclaration d'un élément individuel de la liste
-
 {
-
 	Client client;  
-
-	struct ClientSeul *next;  //On définit un pointeur sur l'élément suivant
-
+struct ClientSeul *next;  //On définit un pointeur sur l'élément suivant
 }ClientSeul;
 
-
-
 typedef struct ListeClient //Déclaration de la liste en elle-même avec une tête de liste, une queue de liste et la taille de la liste
-
 {
-
 	ClientSeul *head;
-
 	int size;
-
 	ClientSeul *tail;
-
 }ListeClient;
 
-
-
 typedef struct ClientFile
-
 {
-
 	int NombreDeClient;
-
 	ListeClient *BDDclient;
-
 } ClientFile;
 
 
@@ -99,10 +83,10 @@ typedef struct ArticleStocks {
 	int Profondeur;					//Profondeur de l'article
 } ArticleStocks;
 /*structure qui defini tous les article stockées dans un entrepot (UN FICHIER) */
-typedef struct StocksEntrepot {
+typedef struct ArticleStocksFile {
 	ArticleStocks *TabArticleStock;	//Un pointeur qui pointe sur un tableau qui liste tous les articles en stocks dans CET entrepot
 	int NombreArticle;				//Le nombre d'article DIFFERENT en stock
-} StocksEntrepot;
+} ArticleStocksFile;
 
 /*structure qui defini un entrepot (le dossier ou il faut aller voir son stock) (UNE LIGNE) */
 typedef struct Entrepot {
