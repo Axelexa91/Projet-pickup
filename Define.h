@@ -19,11 +19,16 @@
 #define CODE_RETRAIT_MAX 9999
 #define QUANTITY_MAX 9999
 #define COMMANDEFILE_MAX 1000
-#define 
-#define 
-#define 
-#define
-#define
-#define
+#define ENTREPOT_ID_MAX 9999
+#define HAUTEUR_MAX 9999 //en cm
+#define LARGEUR_MAX 9999
+#define PROFONDEUR_MAX 9999
+#define ARTICLESRTOCKSFILE_MAX 1000
+#define STATION_ID_MAX 255
+#define SLOT_ID_MAX 9999
+#define ENTREPOTFILE_MAX 1000
+
+#define DISPONIBLE 1
+#define INDISPONIBLE 0
 
 #define SEPARATEUR ';'
