@@ -45,8 +45,7 @@ int lire_champ_suivant(char *ligne, int *idx, char *champ, int taille_champ, cha
 
 	int idx2 = 0;
 
-	while ((idx2 < (taille_champ - 1)) && (ligne[*idx] != separateur)
-		&& (ligne[*idx] != '\0'))
+	while ((idx2 < (taille_champ - 1)) && (ligne[*idx] != separateur) && (ligne[*idx] != '\0'))
 	{
 		champ[idx2] = ligne[*idx];
 		idx2 += 1;
@@ -62,7 +61,7 @@ int lire_champ_suivant(char *ligne, int *idx, char *champ, int taille_champ, cha
 } /* fin lire_champ_suivant() */
 
 
-int charger(ClientFile * client, char nom_fichier[])
+int chargerClient(ClientFile * client, char nom_fichier[])
 {
 	FILE *fic_rep;					/* le fichier */
 	errno_t err;
@@ -95,7 +94,7 @@ int charger(ClientFile * client, char nom_fichier[])
 				if (lire_champ_suivant(buffer, &idx, mot, CLIENT_ID_MAX, SEPARATEUR) == OK)
 				{
 					idx++;							/* on saute le separateur */
-					client->TableauDeClient->ID = atoi(mot);
+					client->TableauDeClient[num_rec].ID = atoi(mot);
 					if (lire_champ_suivant(buffer, &idx, client->TableauDeClient[num_rec].Adresse, CLIENT_ADRESSE_MAX, SEPARATEUR) == OK)
 					{
 						idx++;
@@ -132,6 +131,104 @@ int charger(ClientFile * client, char nom_fichier[])
 	}
 }
 
+int ChargerCommande(CommandeFile * commande, char nom_fichier[])
+{
+	FILE *fic_rep;					/* le fichier */
+	errno_t err;
+	int num_rec = 0;						/* index sur enregistrements */
+	int long_max_rec = 4 * sizeof(Commande);
+	char buffer[4 * sizeof(Commande) + 1];
+	int idx = 0;
+
+	char *char_nw_line;
+
+	_set_errno(0);
+	if ((err = fopen_s(&fic_rep, nom_fichier, "r")) != 0)
+	{
+		return(err);
+	}
+	else
+	{
+		while (!feof(fic_rep) && (commande->NombreDeCommande < COMMANDEFILE_MAX))
+		{
+			if (fgets(buffer, long_max_rec, fic_rep) != NULL)
+			{
+				/* memorisation de l'enregistrement lu dans le tableau */
+				buffer[long_max_rec] = 0;			/* en principe il y a deja un fin_de_chaine, cf fgets */
+
+				if ((char_nw_line = strchr(buffer, '\n')) != NULL)
+					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
+
+				idx = 0;								/* analyse depuis le debut de la ligne */
+				char mot[30];
+
+				if (lire_champ_suivant(buffer, &idx, mot, CLIENT_ID_MAX, SEPARATEUR) == OK)
+				{
+					idx++;
+					commande->TableauDesCommandes[num_rec].ClientID = atoi(mot);
+					if (lire_champ_suivant(buffer, &idx, mot, ARTICLE_ID_MAX, SEPARATEUR) == OK)
+					{
+						idx++;
+						commande->TableauDesCommandes[num_rec].ArticleID = atoi(mot);
+						if (lire_champ_suivant(buffer, &idx, mot, QUANTITY_MAX, SEPARATEUR) == OK)
+						{
+							idx++;
+							commande->TableauDesCommandes[num_rec].Quantity = atoi(mot);
+							if (lire_champ_suivant(buffer, &idx, mot, CODE_RETRAIT_MAX, SEPARATEUR) == OK)
+							{
+								commande->TableauDesCommandes[num_rec].CodeRetrait = atoi(mot);
+								num_rec++;
+							}
+						}
+					}
+				}
+			}
+		}
+		commande->NombreDeCommande = num_rec;
+		fclose(fic_rep);
+		return(OK);
+	}
+}
+
+int recherche(int nbrcommande, ClientFile *client,int IDClient) {
+	for (int j = 0; j < nbrcommande; j++) {
+		if (IDClient == client->TableauDeClient[j].ID) {
+			return(j);
+		}
+	}
+	return(ERROR);
+}
+int sauvegarder(CommandeFile *commande, char nom_fichier[],int i)
+{
+	FILE *fic_rep;					/* le fichier */
+	int openSucces = fopen_s(&fic_rep, nom_fichier, "w");
+	if (openSucces == 0) {
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ClientID); fprintf(fic_rep, ";");
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ArticleID); fprintf(fic_rep, ";");
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].Quantity); fprintf(fic_rep, ";");
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].CodeRetrait); fprintf(fic_rep, "\n");
+	}
+	fclose(fic_rep);
+	return(OK);
+}
+
+void trie(CommandeFile *commande, ClientFile *client) {
+	int pos, departement;
+	char dep[2];
+	for (int i = 0; i < commande->NombreDeCommande; i++) {
+		pos = recherche(commande->NombreDeCommande, client, commande->TableauDesCommandes[i].ClientID);
+		dep[0] = client->TableauDeClient[pos].CodePostal[0], dep[1] = client->TableauDeClient[pos].CodePostal[1];
+		departement = atoi(dep);
+		switch (departement) {
+		case 59:
+			sauvegarder(commande, "nord.txt", i);
+		case 62:
+			sauvegarder(commande, "pas_de_calais.txt", i);
+		}
+	}
+}
+
+
 int main() {
 	ClientFile client;
 	void *tmpPtr;
@@ -139,8 +236,15 @@ int main() {
 	if (tmpPtr != NULL) {
 		client.TableauDeClient= (Client *)tmpPtr;
 	}
-	charger(&client, "client.txt");
-	printf("%d\n%s\n%s\n%s\n%s\n%s\n%s\n%s", client.TableauDeClient[0].ID, client.TableauDeClient[0].Adresse, client.TableauDeClient[0].CodePostal, client.TableauDeClient[0].MotDePasse, client.TableauDeClient[0].Nom, client.TableauDeClient[0].NumeroTel, client.TableauDeClient[0].Prenom, client.TableauDeClient[0].Ville);
+	CommandeFile commande;
+	void *tmpPtr2;
+	tmpPtr2 = (void *)malloc(COMMANDEFILE_MAX * sizeof(Commande));
+	if (tmpPtr2 != NULL) {
+		commande.TableauDesCommandes = (Commande *)tmpPtr2;
+	}
+	chargerClient(&client, "client.txt");
+	ChargerCommande(&commande, "commande.txt");
+	trie(&commande, &client);
 	system("pause");
 	return(0);
 }
