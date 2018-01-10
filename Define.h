@@ -9,7 +9,7 @@
 #define CLIENT_VILLE_MAX 21
 #define CLIENT_CodePostal_MAX 6
 #define CLIENT_TELEPHONE_MAX 11
-#define CLIENT_MotDePasse_MAX 4
+#define CLIENT_MotDePasse_MAX 5
 #define CLIENTFILE_MAX 1000
 #define	ARTICLE_ID_MAX 9999
 #define	ARTICLE_NOM_MAX 21
