@@ -1,0 +1,99 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >
+    <head>
+      <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>Calculer avec Google Map API</title>
+<style type="text/css">
+ 
+</style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
+       <script>
+var directionsDisplay;
+var directionsService = new google.maps.DirectionsService();
+var map;
+var km;
+var k =0;
+var start = [1245,'lille'];
+var end =['paris','marseille','lyon'];
+var station=[001,002,003];
+
+function initialize() { // initialisation de google map
+  directionsDisplay = new google.maps.DirectionsRenderer();
+  var chicago = new google.maps.LatLng(41.850033, -87.6500523);
+  var mapOptions = {
+    zoom: 6,
+    center: chicago
+  }
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  directionsDisplay.setMap(map);
+}
+ 
+function calcRoute(start,end,num) { // fonction qui permets le calcul via google maps de la distance entre l'adresse de départ start et l'ardresse d'arrivée end
+  var waypts = [];
+  var checkboxArray = document.getElementById('waypoints');
+  for (var i = 0; i < checkboxArray.length; i++) {
+    if (checkboxArray.options[i].selected == true) {
+      waypts.push({
+          location:checkboxArray[i].value,
+          stopover:true});
+    }
+  }
+ 
+  var request = {
+      origin: start[1],
+      destination: end[num],
+      waypoints: waypts,
+      optimizeWaypoints: true,
+      travelMode: google.maps.TravelMode.DRIVING
+  };
+  directionsService.route(request, function(response, status) {
+    if (status == google.maps.DirectionsStatus.OK) {
+      var route = response.routes[0];
+      var summaryPanel = document.getElementById('directions_panel');	 
+      summaryPanel.innerHTML = '';
+      // For each route, display summary information.
+      
+      for (var i = 0; i < route.legs.length; i++) {
+        var routeSegment = i + 1;
+        km=route.legs[i].distance.text;
+            var fileSystem=new ActiveXObject("Scripting.FileSystemObject"); //Alors, ce code degeu ne s'execute que sur ie explorer
+            if (num ==0){
+              var monfichier=fileSystem.OpenTextFile("distance.txt", 2 ,true); //Ce code permet de sauvegarder un fichier texte
+            }
+            else{
+              var monfichier=fileSystem.OpenTextFile("distance.txt", 8 ,true); // pour ecrire à la fin du fichier texte
+            }
+            monfichier.Write(start[0]);
+            monfichier.Write(";");
+            monfichier.Write(station[num]);
+            monfichier.Write(";");
+            monfichier.Write(km);//ce code permet l'ecriture dans le fichier
+            monfichier.Writeline(";");
+
+              monfichier.Close();
+
+
+      }
+    }
+  });
+  
+}
+
+ 
+google.maps.event.addDomListener(window, 'load', initialize);
+ 
+    </script>
+</head>
+<body>
+    <multiple id="waypoints"></multiple>
+    
+<script> 
+
+for(var num =0;num<3;num++){
+calcRoute(start,end,num);
+}
+</script>
+    <div id="directions_panel"></div>
+</body>
+</html> 
