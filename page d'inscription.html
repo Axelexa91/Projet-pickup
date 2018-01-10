@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+    <head>
+      <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>page d'inscription</title>
+<style type="text/css">
+body {
+background-color : rgba(189, 189, 189, 0.75);
+font-family: arial;
+font-size:20px
+}
+input {
+color:#000000;
+background-color:#FFFFFF;
+}
+#boutton {
+color:#FFFFFF;
+background-color:#FFFFFF
+}
+#cadre {  
+border-width:2px;
+border-style:solid;
+border-color:#000000
+}
+
+#barrenom{
+  margin: 25px 0px 0px 600px;
+}
+#barreprenom{
+  margin: 00px 0px 0px 50px;
+}
+#barreadresse{
+  margin: 25px 0px 0px 600px;
+}
+#barreville{
+  margin: 00px 0px 0px 50px;
+}
+#barrecodep{
+  margin: 25px 0px 0px 600px;
+}
+#barrenumero{
+  margin: 00px 0px 0px 50px;
+}
+#barremdp{
+  margin: 25px 0px 0px 600px;
+}
+#barreconfirmation{
+  margin: 25px 0px 0px 50px;
+}
+
+#nom{
+  margin: 25px 0px 0px 600px;
+}
+#cp{
+  margin: 25px 0px 0px 600px;
+}
+#ville{
+  margin: 25px 0px 0px 600px;
+}
+#mdp{
+  margin: 25px 0px 0px 600px;
+}
+#inscription{
+  font-size: 25px;
+  color:#1302FF;
+  margin:25px 0px 0px 700px;
+}
+
+ 
+</style>
+    </script>
+</head>
+<body id="cadre">
+<form id="formsuivi" action="sendmail.php" method="post" ENCTYPE="multipart/form-data">
+<multiple id="waypoints">
+<table>
+	<tr>
+  <p id = "inscription">inscription</p>
+  <p id = "nom">nom............................pr&eacute;nom </p>
+  <input type="text" id="barrenom" />
+  <input type="text" id="barreprenom" /><br/>
+  <p id = "ville"> adresse......................ville</p>
+  <input type="text" id="barreadresse" />
+  <input type="text" id="barreville" /><br/>
+  <p id = "cp">code postal.................num&eacute;ro de t&eacute;l&eacute;phone </p>
+  <input type="text" id="barrecodep" />
+  <input type="text" id="barrenumero" /><br/>
+  <p id = "mdp">mot de passe.............confirmation</p>
+  <input type="password" id="barremdp" />
+  <input type="password" id="barreconfirmation" />
+	</tr>
+	</table>
+    <div id="directions_panel"></div>
+<br />
+<hr color="black"/>
+<p><input type="checkbox" id="signature" name="signature" value="Signee">En cochant cette case, je reconnais avoir pris connaissance des conditions d'utilisation.
+<br />
+<br />
+<center>
+<input type="submit" name="Submit" value="S'inscrire" onsubmit="inscription()";>
+</center>
+<br />
+</form>
+</body>
+</html>
