@@ -109,25 +109,25 @@ int charger(ClientFile * Fichierclient, char nom_fichier[])
 					nouv_element->client.ID = atoi(IDtmp);
 					index++;
 
-					if (lire_champ_suivant(buffer, &idx, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie prénom après le séparateur qu'on place dans le nouvel élément
+					if (lire_champ_suivant(buffer, &index, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie prénom après le séparateur qu'on place dans le nouvel élément
 					{
 						index++;
-						if (lire_champ_suivant(buffer, &idx, nouv_element->client.Prenom, CLIENT_PRENOM_MAX, SEPARATEUR) == OK)
+						if (lire_champ_suivant(buffer, &index, nouv_element->client.Prenom, CLIENT_PRENOM_MAX, SEPARATEUR) == OK)
 						{
 							index++;
-							if (lire_champ_suivant(buffer, &idx, nouv_element->client.Adresse, CLIENT_ADRESSE_MAX, SEPARATEUR) == OK)
+							if (lire_champ_suivant(buffer, &index, nouv_element->client.Adresse, CLIENT_ADRESSE_MAX, SEPARATEUR) == OK)
 							{
 								index++;
-								if (lire_champ_suivant(buffer, &idx, nouv_element->client.Ville, CLIENT_VILLE_MAX, SEPARATEUR) == OK)
+								if (lire_champ_suivant(buffer, &index, nouv_element->client.Ville, CLIENT_VILLE_MAX, SEPARATEUR) == OK)
 								{
 									index++;
-									if (lire_champ_suivant(buffer, &idx, nouv_element->client.CodePostal, CLIENT_CodePostal_MAX, SEPARATEUR) == OK)
+									if (lire_champ_suivant(buffer, &index, nouv_element->client.CodePostal, CLIENT_CodePostal_MAX, SEPARATEUR) == OK)
 									{
 										index++;
-										if (lire_champ_suivant(buffer, &idx, nouv_element->client.Numero, CLIENT_TELEPHONE_MAX, SEPARATEUR) == OK)
+										if (lire_champ_suivant(buffer, &index, nouv_element->client.Numero, CLIENT_TELEPHONE_MAX, SEPARATEUR) == OK)
 										{
 											index++;
-											if (lire_champ_suivant(buffer, &idx, nouv_element->client.MotDePasse, CLIENT_MotDePasse_MAX, SEPARATEUR) == OK)
+											if (lire_champ_suivant(buffer, &index, nouv_element->client.MotDePasse, CLIENT_MotDePasse_MAX, SEPARATEUR) == OK)
 											{
 												nombre_client++;
 											}
