@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.10
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "stockentrepot", "stockentrepot\stockentrepot.vcxproj", "{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Debug|x64.ActiveCfg = Debug|x64
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Debug|x64.Build.0 = Debug|x64
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Debug|x86.ActiveCfg = Debug|Win32
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Debug|x86.Build.0 = Debug|Win32
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Release|x64.ActiveCfg = Release|x64
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Release|x64.Build.0 = Release|x64
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Release|x86.ActiveCfg = Release|Win32
+		{BBF180F3-3F5E-4DEA-B7E7-0163D4241BDF}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {13EBEF32-1675-4FFD-B09C-12676A2EC159}
+	EndGlobalSection
+EndGlobal
