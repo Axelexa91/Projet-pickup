@@ -141,6 +141,75 @@ typedef struct Dispatching {
 /*                          DONNEES ENVOYEES                          */
 /*--------------------------------------------------------------------*/
 
+typedef struct EnvoiCommande { //Envoie commande -> Reception commande
+	int ArticleID;							//Commandé
+	int Quantity;							//necessaire
+	char Adresse[CLIENT_ADRESSE_MAX];		//lieu de livraison
+	char Ville[CLIENT_VILLE_MAX];			// "" 
+	char CodePostal[CLIENT_CodePostal_MAX];	// ""
+	char NumeroTel[CLIENT_TELEPHONE_MAX];	// contact
+} EnvoiCommande;
+
+
+typedef struct DemandeArticle { //Dispaching -> recherche dans entrepot
+	int ArticleID;	//Demandé
+	int Quantity;	//necessaire
+} DemandeArticle;
+
+
+typedef struct ReponseArticle { //recherche dans entrepot -> dispaching
+	int EntrepotID; //Sollicité
+	int ArticleID;	//Demandé
+	int Quantity;	//Disponible
+} ReponseArticle;
+
+
+
+typedef struct ReservationArticle { //Dispaching -> Recherche dans entrepot
+	int ArticleID;	//réservé
+	int Quantity;	//réservé	
+} ReservationArticle;
+
+
+typedef struct DemandeSlot {//Dispaching -> gestion station pickup
+	int ArticleID;	//A mettre a disposition
+	int Quantity;	//A mettre a disposition
+	int Hauteur;	//nécessaire du slot
+	int Largeur;	//nécessaire du slot
+	int profondeur;	//nécessaire du slot
+} DemandeSlot;
+
+
+typedef struct ReponseSlot { //Gestion station pickup -> Dispaching
+	int SationID;	//sollicité
+	int ArticleID;	//à héberger
+	int Quantity;	//capable d'acceuillir
+	int SlotID;		//disponible pour cette commande
+} ReponseSlot;
+
+
+typedef struct ReservationSlot { //dispaching -> gestion de la station pickup
+	int SlotID;				//A reserver
+	int ArticleID;			//A heberger
+	int Quantity;			//A heberger
+	char NumeroTelClient[CLIENT_TELEPHONE_MAX];	//Login
+	char CodeAccesClient[CLIENT_MotDePasse_MAX];	//Password
+} ReservationSlot;
+
+
+typedef struct ValidationSlot {//Gestion station pickup -> Dispaching
+	int SlotID;		//réservé
+	int Disponible; //0 = plus de disponibilité , 1 = Réservé
+} ValidationSlot;
+
+
+typedef struct FinCommande { //Dispaching -> terminal
+	char AdressePickup[CLIENT_ADRESSE_MAX];		//
+	char VillePickup[CLIENT_VILLE_MAX];		//
+	char CodePostalPickup[CLIENT_CodePostal_MAX];	//
+	int SlotID;				//
+	char CodeAccesSlot[CLIENT_MotDePasse_MAX];		//
+} FinCommande;
 
 
 
