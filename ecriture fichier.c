@@ -4,10 +4,10 @@
 
 
 
-int Ecrire(const char NomFichier, ArticleStocksFile *Stock){
+int Ecrire(const char NomFichier[], ArticleStocksFile *Stock){
 	FILE *fichier;
 	char Buffer[1028]; //une ligne de 1028 de long maximum
-	fopen_s(&fichier, &NomFichier, "w");//ouverture du fichier voulu en mode ecriture
+	fopen_s(&fichier, NomFichier, "w");//ouverture du fichier voulu en mode ecriture
 	if (fichier == NULL || Stock->NombreArticle == 0 || Stock->TabArticleStock == NULL) return ERROR;
 	for (int i = 0; i < Stock->NombreArticle; i++) { //on ecrit chaque ligne jusqu'a avoir atteint le nombre de ligne du fichier
 		sprintf_s(Buffer, 1028, "%d;%d;%d;%d;%d;%d;\n", ((Stock->TabArticleStock)+i)->ArticleID, ((Stock->TabArticleStock) + i)->EntrepotID, ((Stock->TabArticleStock) + i)->Hauteur, ((Stock->TabArticleStock) + i)->Largeur, ((Stock->TabArticleStock) + i)->Profondeur, ((Stock->TabArticleStock) + i)->Quantity); //le format d'une ligne, les element a mettre ATTENTION PEUT ETRE DANS LE MAUVAIS ORDRE ; le tout ecrit dans le buffer
