@@ -201,7 +201,7 @@ int recherche(int nbrcommande, ClientFile *client,int IDClient) {
 int sauvegarder(CommandeFile *commande, char nom_fichier[],int i)
 {
 	FILE *fic_rep;					/* le fichier */
-	int openSucces = fopen_s(&fic_rep, nom_fichier, "w");
+	int openSucces = fopen_s(&fic_rep, nom_fichier, "a");
 	if (openSucces == 0) {
 		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ClientID); fprintf(fic_rep, ";");
 		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ArticleID); fprintf(fic_rep, ";");
@@ -222,8 +222,10 @@ void trie(CommandeFile *commande, ClientFile *client) {
 		switch (departement) {
 		case 59:
 			sauvegarder(commande, "nord.txt", i);
+			break;
 		case 62:
 			sauvegarder(commande, "pas_de_calais.txt", i);
+			break;
 		}
 	}
 }
