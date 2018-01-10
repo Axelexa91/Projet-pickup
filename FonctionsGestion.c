@@ -24,6 +24,13 @@ int main() {
 	else if (choix == 2) {
 		creation_compte(&ListeClient);
 	}
+	scanf_s("%d", &choix);
+	if (choix == 1) {
+		connexion(&ListeClient);
+	}
+	else if (choix == 2) {
+		creation_compte(&ListeClient);
+	}
 	system("pause");
 	return(-1);
 }
@@ -106,10 +113,10 @@ int charger(ClientFile * Fichierclient, char nom_fichier[])
 
 				if (lire_champ_suivant(buffer, &index, IDtmp, 5, SEPARATEUR) == OK)
 				{
-					nouv_element->client.ID = atoi(IDtmp);
+					nouv_element->client.ID = atoi(IDtmp);   //On transforme la chaine de caractère en entier
 					index++;
 
-					if (lire_champ_suivant(buffer, &index, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie prénom après le séparateur qu'on place dans le nouvel élément
+					if (lire_champ_suivant(buffer, &index, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie nom après le séparateur qu'on place dans le nouvel élément
 					{
 						index++;
 						if (lire_champ_suivant(buffer, &index, nouv_element->client.Prenom, CLIENT_PRENOM_MAX, SEPARATEUR) == OK)
@@ -139,17 +146,17 @@ int charger(ClientFile * Fichierclient, char nom_fichier[])
 						/* element à priori correct, on le comptabilise */
 					}
 				}
-				if (Fichierclient->BDDclient->size == 0) //Si la liste est vide on ajoute l'élément en tête de liste
+				if (Fichierclient->BDDclient->size == 0) //Si la liste est vide on fait pointer la tête de liste sur cet élément
 				{
 					Fichierclient->BDDclient->head = nouv_element;
 					//printf("%d", nouv_element->client.ID);
 				}
 				else
 				{
-					Fichierclient->BDDclient->tail->next = nouv_element; //Si la liste est vide on ajoute l'élément en queue de liste
+					Fichierclient->BDDclient->tail->next = nouv_element; //Si la liste est non vide on fait pointer l'élément suivant la queue de liste sur cet élément
 				}
-				Fichierclient->BDDclient->tail = nouv_element;
-				Fichierclient->BDDclient->size++;
+				Fichierclient->BDDclient->tail = nouv_element; //La queue pointe dans tous les cas sur l'élément ajouté
+				Fichierclient->BDDclient->size++;   
 				Fichierclient->NombreDeClient++;
 			}
 		}fclose(fic_client);
@@ -157,11 +164,15 @@ int charger(ClientFile * Fichierclient, char nom_fichier[])
 	}
 }
 
+
+/*---Fonction qui permet de sauvegarder dans un fichier texte la liste chainée s'il y a eu changements---*/
 int sauvegarder(ClientFile *Fichierclient, char nom_fichier[])
 {
 	FILE *fic_client;					/* le fichier */
 	errno_t err;
 	int i = 0;
+	int div = 10;
+	int nbdig = 0;  //Permet de savoir le nombre de digit de l'ID pour normaliser l'écriture dans le fichier avec les 0
 	if ((err = fopen_s(&fic_client, nom_fichier, "w")) != 0)
 	{
 		return(err);
@@ -174,7 +185,8 @@ int sauvegarder(ClientFile *Fichierclient, char nom_fichier[])
 		{
 			while (i < Fichierclient->NombreDeClient)
 			{
-				fprintf(fic_client, "%4d", client->client.ID);
+				
+				fprintf(fic_client, "%d", client->client.ID);   //A MODIFIER POUR AVOIR L'ID SUR 4 DIGITS
 				fputs(";", fic_client);
 				fputs(client->client.Nom, fic_client);
 				fputs(";", fic_client);
@@ -203,6 +215,8 @@ int sauvegarder(ClientFile *Fichierclient, char nom_fichier[])
 	return(OK);
 } /* fin sauvegarder */
 
+
+/*---Fonction qui permet de se connecter en comparant un ID et un mot de passe d'un fichier avec la BDD client---*/
 int connexion(ClientFile *FichierClient)
 {
 	FILE *fic_connexion = NULL;
@@ -262,7 +276,7 @@ int connexion(ClientFile *FichierClient)
 	{
 		do
 		{
-			if (ID == clientcherche->client.ID)
+			if (ID == clientcherche->client.ID)   //On compare l'ID entré avec tous ceux de la BDD
 			{
 				trouve = 1;
 			
@@ -278,7 +292,7 @@ int connexion(ClientFile *FichierClient)
 	{
 		return(-1);
 	}
-	if (trouve == 1)
+	if (trouve == 1) //Si l'ID correspond on verifie le mot de passe correspondant à la ligne de l'ID
 	{
 		printf("%s", motdepasse);
 		if (strcmp(motdepasse, clientcherche->client.MotDePasse) == 0)
@@ -288,6 +302,8 @@ int connexion(ClientFile *FichierClient)
 	}
 }
 
+
+/*---Fonction qui permet de créer un compte avec les infos d'un fichier et l'ajouter à la BDD client---*/
 int creation_compte(ClientFile *Fichierclient)
 {
 	static int nouv_ID;
@@ -296,7 +312,7 @@ int creation_compte(ClientFile *Fichierclient)
 	nouv_client = (ClientSeul *)malloc(sizeof(ClientSeul)); //La taille de l'élément est définie de manière dynamique
 	nouv_client->next = NULL; //L'élément pointe sur un élément suivant qui est nul
 
-	nouv_ID = nouv_ID++;
+	nouv_ID++; //On crée un nouvel ID en incrémentant de 1 le précédent créé
 	nouv_client->client.ID = nouv_ID;
 
 	FILE *fic_creation= NULL;
