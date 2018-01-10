@@ -72,7 +72,6 @@ typedef struct CommandeFile {
 
 
 
-
 /*strucutre qui défini les stocks d'un article dans un entrepot (UNE LIGNE) */
 typedef struct ArticleStocks {
 	int EntrepotID;					//ID de l'entrepot (USELESS)
