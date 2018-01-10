@@ -98,35 +98,35 @@ int charger(ClientFile * Fichierclient, char nom_fichier[])
 				*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
 			}
 
-				idx = 0;								/* analyse depuis le debut de la ligne */
+				index = 0;								/* analyse depuis le debut de la ligne */
 
 				ClientSeul *nouv_element;
 				nouv_element = (ClientSeul *)malloc(sizeof(ClientSeul)); //On alloue au nouvel élément une place suffisante en mémoire pour contenir un enregistrement
 				nouv_element->next = NULL;
 
-				if (lire_champ_suivant(buffer, &idx, IDtmp, 5, SEPARATEUR) == OK)
+				if (lire_champ_suivant(buffer, &index, IDtmp, 5, SEPARATEUR) == OK)
 				{
 					nouv_element->client.ID = atoi(IDtmp);
-					idx++;
+					index++;
 
 					if (lire_champ_suivant(buffer, &idx, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie prénom après le séparateur qu'on place dans le nouvel élément
 					{
-						idx++;
+						index++;
 						if (lire_champ_suivant(buffer, &idx, nouv_element->client.Prenom, CLIENT_PRENOM_MAX, SEPARATEUR) == OK)
 						{
-							idx++;
+							index++;
 							if (lire_champ_suivant(buffer, &idx, nouv_element->client.Adresse, CLIENT_ADRESSE_MAX, SEPARATEUR) == OK)
 							{
-								idx++;
+								index++;
 								if (lire_champ_suivant(buffer, &idx, nouv_element->client.Ville, CLIENT_VILLE_MAX, SEPARATEUR) == OK)
 								{
-									idx++;
+									index++;
 									if (lire_champ_suivant(buffer, &idx, nouv_element->client.CodePostal, CLIENT_CodePostal_MAX, SEPARATEUR) == OK)
 									{
-										idx++;
+										index++;
 										if (lire_champ_suivant(buffer, &idx, nouv_element->client.Numero, CLIENT_TELEPHONE_MAX, SEPARATEUR) == OK)
 										{
-											idx++;
+											index++;
 											if (lire_champ_suivant(buffer, &idx, nouv_element->client.MotDePasse, CLIENT_MotDePasse_MAX, SEPARATEUR) == OK)
 											{
 												nombre_client++;
