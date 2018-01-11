@@ -24,12 +24,13 @@ int init_tableau_commandes(CommandeFile* AllCommandes) {
 
 /*Cette fonction est activée à chaque nouvelle Commande entrée par l'utilisateur.
 Elle permet de créer un tableau dans lequel sera contenu la commande en question
-contenue dans le fichier "achat".*/
+contenue dans le fichier FichierAchat.*/
 int init_Commande(Commande* Com) {
 	Com->ArticleID = 0;
 	Com->ClientID = 0;
 	Com->CodeRetrait = 0;
 	Com->Quantity = 0;
+	return OK;
 }
 
 
@@ -117,6 +118,26 @@ int envoi_commandes(CommandeFile *AllCommandes, char nom_fichier[]) {
 /**********************************************************************/
 /*                      Fonctions charger                             */
 /**********************************************************************/
+
+int lire_champ_suivant(char *ligne, int *idx, char *champ, int taille_champ, char separateur)
+{
+	int idx2 = 0;
+
+	while ((idx2 < (taille_champ - 1)) && (ligne[*idx] != separateur)
+		&& (ligne[*idx] != '\0'))
+	{
+		champ[idx2] = ligne[*idx];
+		idx2 += 1;
+		*idx += 1;
+	}
+	if ((ligne[*idx] == separateur) || (ligne[*idx] == '\0'))
+	{
+		champ[idx2] = 0;	/* fin de chaine sur caractere suivant */
+		return(OK);
+	}
+	else return(ERROR);		/* fin de ligne ou séparateur non atteints */
+
+} /* fin lire_champ_suivant() */
 
 int charger_fichier_vente(CommandeFile* Fichier, char nom_fichier[])
 {
@@ -234,31 +255,12 @@ Commande charger_fichier_achat(Commande New, char nom_fichier[])
 
 /* fin charger */
 
-int lire_champ_suivant(char *ligne, int *idx, char *champ, int taille_champ, char separateur)
-{
-	int idx2 = 0;
-
-	while ((idx2 < (taille_champ - 1)) && (ligne[*idx] != separateur)
-		&& (ligne[*idx] != '\0'))
-	{
-		champ[idx2] = ligne[*idx];
-		idx2 += 1;
-		*idx += 1;
-	}
-	if ((ligne[*idx] == separateur) || (ligne[*idx] == '\0'))
-	{
-		champ[idx2] = 0;	/* fin de chaine sur caractere suivant */
-		return(OK);
-	}
-	else return(ERROR);		/* fin de ligne ou séparateur non atteints */
-
-} /* fin lire_champ_suivant() */
 
   /**********************************************************************/
   /*                      Fonction principale                           */
   /**********************************************************************/
 
-int main() {
+int Gestion_Achat(const char *FichierAchat) {
 	CommandeFile AllCommandes; // Contient toutes les commandes des 4h
 	CommandeFile Panier; // Contient toutes les commandes effectués par un client durant son achat
 	Commande NewAchat;
@@ -266,14 +268,13 @@ int main() {
 	init_tableau_commandes(&AllCommandes);
 	init_Commande(&NewAchat);
 	charger_fichier_vente(&AllCommandes, "commande");
-	NewAchat=charger_fichier_achat(NewAchat,"achat");
+	NewAchat=charger_fichier_achat(NewAchat,FichierAchat);
 	ajout_panier(&Panier, NewAchat.ClientID, NewAchat.ArticleID, NewAchat.Quantity);
-	printf("Fichier Vente contient %d commandes.", AllCommandes.NombreDeCommande);
-	for (int i = 0; i < AllCommandes.NombreDeCommande; i++) {
-		printf("%d %d %d %d \n", AllCommandes.TableauDesCommandes[i]);
-	}
 	validation_panier(&AllCommandes, &Panier);
 	envoi_commandes(&AllCommandes, "commande");
-	system("pause");
 	return 1;
+}
+
+int main() {
+	int a=Gestion_Achat("achat");
 }
