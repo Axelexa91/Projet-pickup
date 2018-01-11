@@ -1,3 +1,1 @@
-   1;A;B;C;la vie;O;D;B
-   1;A;B;C;I;la ;D;B
-   1;A;B;C;I;O;D;B
+1;A;B;C;I;O;D;B
