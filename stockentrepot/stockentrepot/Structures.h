@@ -1,31 +1,65 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define OK 0
+#define ERROR -1
+
+#define CLIENT_ID_MAX 9999 
+#define CLIENT_NOM_MAX 21
+#define CLIENT_PRENOM_MAX 21
+#define CLIENT_ADRESSE_MAX 51
+#define CLIENT_VILLE_MAX 21
+#define CLIENT_CodePostal_MAX 6
+#define CLIENT_TELEPHONE_MAX 11
+#define CLIENT_MotDePasse_MAX 5
+#define CLIENTFILE_MAX 1000
+#define	ARTICLE_ID_MAX 9999
+#define	ARTICLE_NOM_MAX 21
+#define	ARTICLE_DESCRIPTION_MAX 21
+#define ARTICLE_TYPE_MAX 21
+#define ARTICLEFILE_MAX 1000
+#define CODE_RETRAIT_MAX 9999
+#define QUANTITY_MAX 9999
+#define COMMANDEFILE_MAX 1000
+#define ENTREPOT_ID_MAX 9999
+#define HAUTEUR_MAX 9999 //en cm
+#define LARGEUR_MAX 9999
+#define PROFONDEUR_MAX 9999
+#define ARTICLESRTOCKSFILE_MAX 1000
+#define STATION_ID_MAX 255
+#define SLOT_ID_MAX 9999
+#define ENTREPOT_NOM_DOSSIER_MAX 21
+#define ENTREPOTFILE_MAX 1000
+
+#define DISPONIBLE 1
+#define INDISPONIBLE 0
+
+#define SEPARATEUR ';'
 
 /*--------------------------------------------------------------------*/
 /*                          DONNEES STOCKEES                          */
 /*--------------------------------------------------------------------*/
 
-/*La structure qui dÃ©fini un client (UNE LIGNE) */ 
-typedef struct Client {	
+/*La structure qui défini un client (UNE LIGNE) */
+typedef struct Client {
 	int ID;								//4 chiffres pour l'ID
-	char Nom[CLIENT_NOM_MAX];						//Nom de 20 caractÃ¨re alpha ( +1 pour le \0 de fin de chaine de caractÃ¨re )
-	char Prenom[CLIENT_PRENOM_MAX];					//Prenom de 20 caractÃ¨re alpha ( +1 pour \0 de fin de chaine de caractÃ¨re)
-	char Adresse[CLIENT_ADRESSE_MAX];					//localisation ( adresse ) du client, 50 caractÃ¨res ( +1 pour \0 de fin de chainede caractÃ¨re )
+	char Nom[CLIENT_NOM_MAX];						//Nom de 20 caractère alpha ( +1 pour le \0 de fin de chaine de caractère )
+	char Prenom[CLIENT_PRENOM_MAX];					//Prenom de 20 caractère alpha ( +1 pour \0 de fin de chaine de caractère)
+	char Adresse[CLIENT_ADRESSE_MAX];					//localisation ( adresse ) du client, 50 caractères ( +1 pour \0 de fin de chainede caractère )
 	char Ville[CLIENT_VILLE_MAX];						//La ville du client (+1 pour le \0)
 	char CodePostal[CLIENT_CodePostal_MAX];					//Code postal du client 5 chiffres + le \0
-	char NumeroTel[CLIENT_TELEPHONE_MAX];					//numÃ©ro de tÃ©lÃ©phone, 10 chiffres dit caractÃ¨re numÃ©rique ( et PAS alphanumÃ©rique ) (+1 pour le \0 de fin de chaine de caractÃ¨re )
-	char MotDePasse[CLIENT_MotDePasse_MAX];					//Mot de passe de 4 caractÃ¨re alphanumÃ©rique (+1 pour le \0Ã  de fin de chaine de caractÃ¨re)
+	char NumeroTel[CLIENT_TELEPHONE_MAX];					//numéro de téléphone, 10 chiffres dit caractère numérique ( et PAS alphanumérique ) (+1 pour le \0 de fin de chaine de caractère )
+	char MotDePasse[CLIENT_MotDePasse_MAX];					//Mot de passe de 4 caractère alphanumérique (+1 pour le \0à de fin de chaine de caractère)
 } Client;
 
 /*La structure qui regroupe tous les clients (UN FICHIER) */
-typedef struct ClientSeul  //DÃ©claration d'un Ã©lÃ©ment individuel de la liste
+typedef struct ClientSeul  //Déclaration d'un élément individuel de la liste
 {
-	Client client;  
-	struct ClientSeul *next;  //On dÃ©finit un pointeur sur l'Ã©lÃ©ment suivant
+	Client client;
+	struct ClientSeul *next;  //On définit un pointeur sur l'élément suivant
 }ClientSeul;
 
-typedef struct ListeClient //DÃ©claration de la liste en elle-mÃªme avec une tÃªte de liste, une queue de liste et la taille de la liste
+typedef struct ListeClient //Déclaration de la liste en elle-même avec une tête de liste, une queue de liste et la taille de la liste
 {
 	ClientSeul *head;
 	int size;
@@ -44,12 +78,12 @@ typedef struct ClientFile
 /*La structure qui definit un Article (UNE LIGNE) */
 typedef struct Article {
 	int ID;								//4 chiffres pour l'ID
-	char Nom[ARTICLE_NOM_MAX];						//Nom de l'article de 20 caractÃ¨re ( +1 pour le \0 de fin de chaine de caractÃ¨re )
-	char Description[ARTICLE_DESCRIPTION_MAX];				//Description de l'article de 20 caractÃ¨re de long ( +1 pour le \0 de fin de chaine de caractÃ¨re )
-	char Type[ARTICLE_TYPE_MAX];						//Type de l'article de 20 caractÃ¨re de long
+	char Nom[ARTICLE_NOM_MAX];						//Nom de l'article de 20 caractère ( +1 pour le \0 de fin de chaine de caractère )
+	char Description[ARTICLE_DESCRIPTION_MAX];				//Description de l'article de 20 caractère de long ( +1 pour le \0 de fin de chaine de caractère )
+	char Type[ARTICLE_TYPE_MAX];						//Type de l'article de 20 caractère de long
 } Article;
-/*La structure qui regroupe tous les articles dÃ©fini (UN FICHIER) */
-typedef struct ArticleFile {	
+/*La structure qui regroupe tous les articles défini (UN FICHIER) */
+typedef struct ArticleFile {
 	Article *TableauDesArticles;		//Un pointeur sur un tableau d'article (Necessite un malloc et des realloc)
 	int NombreArticles;					//Nombre d'article dans ce fichier d'article
 } ArticleFile;
@@ -61,7 +95,7 @@ typedef struct ArticleFile {
 typedef struct Commande {
 	int ClientID;						//L'ID du client qui passe la commande
 	int ArticleID;						//L'ID de l'article que le client a commander
-	int Quantity;						//La quantitÃ© de c et article que le client Ã  commander
+	int Quantity;						//La quantité de c et article que le client à commander
 	int CodeRetrait;					//Le code que le client doit taper afin de retirer son colis dans les pickup Station
 } Commande;
 /*La structure qui regroupe toutes les commandes (UN FICHIER) */
@@ -72,16 +106,17 @@ typedef struct CommandeFile {
 
 
 
-/*strucutre qui dÃ©fini les stocks d'un article dans un entrepot (UNE LIGNE) */
+
+/*strucutre qui défini les stocks d'un article dans un entrepot (UNE LIGNE) */
 typedef struct ArticleStocks {
 	int EntrepotID;					//ID de l'entrepot (USELESS)
 	int ArticleID;					//ID de l'article
-	int Quantity;					//QuantitÃ© en stock de cet article
+	int Quantity;					//Quantité en stock de cet article
 	int Hauteur;					//Hauteur de l'article	
 	int Largeur;					//Largeur de l'article
 	int Profondeur;					//Profondeur de l'article
 } ArticleStocks;
-/*structure qui defini tous les article stockÃ©es dans un entrepot (UN FICHIER) */
+/*structure qui defini tous les article stockées dans un entrepot (UN FICHIER) */
 typedef struct ArticleStocksFile {
 	ArticleStocks *TabArticleStock;	//Un pointeur qui pointe sur un tableau qui liste tous les articles en stocks dans CET entrepot
 	int NombreArticle;				//Le nombre d'article DIFFERENT en stock
@@ -139,6 +174,76 @@ typedef struct Dispatching {
 /*--------------------------------------------------------------------*/
 /*                          DONNEES ENVOYEES                          */
 /*--------------------------------------------------------------------*/
+
+typedef struct EnvoiCommande { //Envoie commande -> Reception commande
+	int ArticleID;							//Commandé
+	int Quantity;							//necessaire
+	char Adresse[CLIENT_ADRESSE_MAX];		//lieu de livraison
+	char Ville[CLIENT_VILLE_MAX];			// "" 
+	char CodePostal[CLIENT_CodePostal_MAX];	// ""
+	char NumeroTel[CLIENT_TELEPHONE_MAX];	// contact
+} EnvoiCommande;
+
+
+typedef struct DemandeArticle { //Dispaching -> recherche dans entrepot
+	int ArticleID;	//Demandé
+	int Quantity;	//necessaire
+} DemandeArticle;
+
+
+typedef struct ReponseArticle { //recherche dans entrepot -> dispaching
+	int EntrepotID; //Sollicité
+	int ArticleID;	//Demandé
+	int Quantity;	//Disponible
+} ReponseArticle;
+
+
+
+typedef struct ReservationArticle { //Dispaching -> Recherche dans entrepot
+	int ArticleID;	//réservé
+	int Quantity;	//réservé	
+} ReservationArticle;
+
+
+typedef struct DemandeSlot {//Dispaching -> gestion station pickup
+	int ArticleID;	//A mettre a disposition
+	int Quantity;	//A mettre a disposition
+	int Hauteur;	//nécessaire du slot
+	int Largeur;	//nécessaire du slot
+	int profondeur;	//nécessaire du slot
+} DemandeSlot;
+
+
+typedef struct ReponseSlot { //Gestion station pickup -> Dispaching
+	int SationID;	//sollicité
+	int ArticleID;	//à héberger
+	int Quantity;	//capable d'acceuillir
+	int SlotID;		//disponible pour cette commande
+} ReponseSlot;
+
+
+typedef struct ReservationSlot { //dispaching -> gestion de la station pickup
+	int SlotID;				//A reserver
+	int ArticleID;			//A heberger
+	int Quantity;			//A heberger
+	char NumeroTelClient[CLIENT_TELEPHONE_MAX];	//Login
+	char CodeAccesClient[CLIENT_MotDePasse_MAX];	//Password
+} ReservationSlot;
+
+
+typedef struct ValidationSlot {//Gestion station pickup -> Dispaching
+	int SlotID;		//réservé
+	int Disponible; //0 = plus de disponibilité , 1 = Réservé
+} ValidationSlot;
+
+
+typedef struct FinCommande { //Dispaching -> terminal
+	char AdressePickup[CLIENT_ADRESSE_MAX];		//
+	char VillePickup[CLIENT_VILLE_MAX];		//
+	char CodePostalPickup[CLIENT_CodePostal_MAX];	//
+	int SlotID;				//
+	char CodeAccesSlot[CLIENT_MotDePasse_MAX];		//
+} FinCommande;
 
 
 
