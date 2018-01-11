@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+    <head>
+      <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>page d'achat</title>
+<style type="text/css">
+body {
+  width:100%;
+  margin:0;
+  padding:100;
+  background: url(http://image.noelshack.com/fichiers/2018/02/3/1515570410-fond-gris-1.jpg) no-repeat center fixed; 
+  -webkit-background-size: cover; 
+  background-size: cover;
+font-size:20px
+}
+input {
+color:#000000;
+background-color:#FFFFFF;
+}
+#boutton {
+color:#FFFFFF;
+background-color:#FFFFFF
+}
+#cadre {  
+border-width:2px;
+border-style:solid;
+border-color:#000000
+}
+
+#poulet{
+margin: 0px 0px 0px 100px;
+}
+#quantité{
+margin: 25px 0px 0px 200px ;
+}
+#zonetext{
+    margin: 0px 0px 0px 200px;
+}
+
+#description{
+ margin: 25px 0 0 200px;
+ color:#FFFFFF;
+}
+
+#articles{
+  font-size: 25px;
+  color:#A5008F;
+  margin:25px 0px 0px 700px;
+}
+
+
+</style>
+<script>
+  function retour(){
+    html:location.href='page achat.html'
+  }
+  function validation(){
+    var quantité = document.getElementById('zonetext').value;
+    var IDarticle =1;
+    var fileSystem=new ActiveXObject("Scripting.FileSystemObject");
+    var monfichier=fileSystem.OpenTextFile("achat.txt", 8 ,true);
+    monfichier.Write(IDarticle);
+    monfichier.Write(";");
+    monfichier.Write(quantité);
+    monfichier.Write(";");
+    html:location.href='page achat.html';
+
+  }
+</script>
+</head>
+<body id="cadre">
+        
+        
+<multiple id="waypoints">
+<table>
+	<tr>
+  <p id = "articles">aile de poulet</p>
+  <p id = "description">Frit avec amour</p>
+  <img id ="poulet" src="http://www.lesfoodies.com/_recipeimage/214289/ailes-poulet-grilles-au-four.jpg" width="800" alt="Photo de poulet" title="poulet" />
+  <p id ="quantité">quantit&eacute; d&eacute;sir&eacute;e</p>
+  <input type="text" name="de" id="zonetext">
+  <input type="button" name="truc1" id="validation" value ="validation" onclick ="validation()">
+  <input type="button" name="truc2" id="retour" value ="retour" onclick ="html:location.href='page achat.html'">
+  
+	</tr>
+	</table>
+    <div id="directions_panel"></div>
+<br />
+<hr color="black"/>
+</center>
+<br />
+</form>
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+    <head>
+      <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+<title>page d'achat</title>
+<style type="text/css">
+body {
+  width:100%;
+  margin:0;
+  padding:100;
+  background: url(http://image.noelshack.com/fichiers/2018/02/3/1515570410-fond-gris-1.jpg) no-repeat center fixed; 
+  -webkit-background-size: cover; 
+  background-size: cover;
+font-size:20px
+}
+input {
+color:#000000;
+background-color:#FFFFFF;
+}
+#boutton {
+color:#FFFFFF;
+background-color:#FFFFFF
+}
+#cadre {  
+border-width:2px;
+border-style:solid;
+border-color:#000000
+}
+
+#concombre{
+margin: 0px 0px 0px 100px;
+}
+#quantité{
+margin: 25px 0px 0px 200px ;
+}
+#zonetext{
+    margin: 0px 0px 0px 200px;
+}
+
+#description{
+ margin: 25px 0 0 200px;
+ color:#FFFFFF;
+}
+
+#articles{
+  font-size: 25px;
+  color:#A5008F;
+  margin:25px 0px 0px 700px;
+}
+
+
+</style>
+    </script>
+    <script>
+
+    </script>
+</head>
+<body id="cadre">
+        
+        
+<form id="formsuivi" action="sendmail.php" method="post" ENCTYPE="multipart/form-data">
+<multiple id="waypoints">
+<table>
+	<tr>
+  <p id = "articles">poign&eacute;e de porte</p>
+  <p id = "description">Pour les collectionneurs</p>
+  <img id ="concombre" src="http://www.1001poignees.com/c/15-category_default/sur-rosace.jpg" width="800" alt="Photo de poulet" title="poign&eacute;e de porte" />
+  <p id ="quantité">quantit&eacute; d&eacute;sir&eacute;e</p>
+  <input type="text" name="de" id="zonetext">
+  <input type="button" name="truc" id="validation" value ="validation">
+  <input type="button" name="truc" id="validation" value ="retour" onclick ="html:location.href='page achat.html'">
+  
+	</tr>
+	</table>
+    <div id="directions_panel"></div>
+<br />
+<hr color="black"/>
+</center>
+<br />
+</form>
+</body>
+</html>

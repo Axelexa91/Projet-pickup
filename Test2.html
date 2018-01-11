@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+        <title>page d'inscription</title>
+        <style type="text/css">
+            body {
+                width:100%;
+                margin:0;
+                padding:100;
+                background: url(http://image.noelshack.com/fichiers/2018/02/3/1515570410-fond-gris-1.jpg) no-repeat center fixed; 
+                -webkit-background-size: cover; 
+                background-size: cover;
+                font-size:20px
+                }
+            input {
+                color:#000000;
+                background-color:#FFFFFF;
+            }
+            #boutton {
+                color:#FFFFFF;
+                background-color:#FFFFFF
+            }
+            #cadre {  
+                border-width:2px;
+                border-style:solid;
+                border-color:#000000
+                
+            }
+            #barrenom{
+            margin: 25px 0px 0px 600px;
+            }
+            #barreprenom{
+            margin: 00px 0px 0px 50px;
+            }
+            #barreadresse{
+            margin: 25px 0px 0px 600px;
+            }
+            #barreville{
+            margin: 00px 0px 0px 50px;
+            }
+            #barrecodep{
+            margin: 25px 0px 0px 600px;
+            }
+            #barrenumero{
+            margin: 00px 0px 0px 50px;
+            }
+            #barremdp{
+            margin: 25px 0px 0px 600px;
+            }
+            #barreconfirmation{
+            margin: 25px 0px 0px 50px;
+            }
+            #nom{
+            margin: 25px 0px 0px 620px;
+            color:#FFFFFF;
+            }
+            #cp{
+            margin: 25px 0px 0px 620px;
+            color:#FFFFFF;
+            }
+            #ville{
+            margin: 25px 0px 0px 620px;
+            color:#FFFFFF;
+            }
+            #mdp{
+            margin: 25px 0px 0px 620px;
+            color:#FFFFFF;
+            }
+            #inscription{
+            font-size: 25px;
+            color:#A5008F;
+            margin:25px 0px 0px 700px;
+            }
+        </style>
+    </script>
+
+    <script>
+      function inscription(){
+        var nom = document.getElementById('barrenom').value;
+        var prenom = document.getElementById('barreprenom').value;
+        var adresse = document.getElementById('barreadresse').value;
+        var ville = document.getElementById('barreville').value;
+        var cp = document.getElementById('barrecodep').value;
+        var numero = document.getElementById('barrenumero').value;
+        var mdp = document.getElementById('barremdp').value;
+        var confirmation = document.getElementById('barreconfirmation').value;
+        var affichage =document.getElementById('directions_panel');
+        affichage.innerHTML='';
+        if (mdp==confirmation){
+          affichage.innerHTML += 'inscription valid&eacute;e';
+        }
+        else{
+          affichage.innerHTML += 'mot de passe et confirmation non iddentique merci de r&eacute;essayer';
+        }
+      }
+    </script>
+</head>
+<body id="cadre">
+    <form id="formsuivi" action="sendmail.php" method="post" ENCTYPE="multipart/form-data">
+        <multiple id="waypoints">
+            
+        <table>
+            <tr>
+        <p id = "inscription">inscription</p>
+        <p id = "nom">nom...............................pr&eacute;nom </p>
+        <input type="text" id="barrenom" />
+        <input type="text" id="barreprenom" /><br/>
+        <p id = "ville"> adresse...........................ville</p>
+        <input type="text" id="barreadresse" />
+        <input type="text" id="barreville" /><br/>
+        <p id = "cp">code postal....................num&eacute;ro de t&eacute;l&eacute;phone </p>
+        <input type="text" id="barrecodep" />
+        <input type="text" id="barrenumero" /><br/>
+        <p id = "mdp">mot de passe..................confirmation</p>
+        <input type="password" id="barremdp" />
+        <input type="password" id="barreconfirmation" />
+            </tr>
+            </table>
+            <div id="directions_panel"></div>
+        <br />
+        <hr color="black"/>
+        <p><input type="checkbox" id="signature" name="signature" value="Signee">En cochant cette case, je reconnais avoir pris connaissance des conditions d'utilisation.
+        <br />
+        <br />
+        <center>
+        <input type="button" name="Submit" value="S'inscrire" onclick="inscription()";>
+        </center>
+        <br />
+    
+        </form>
+    </body>
+</html>

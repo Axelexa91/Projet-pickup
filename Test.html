@@ -1,0 +1,100 @@
+<!doctype html> 
+<html lang="en"> 
+    
+<head> 
+    <meta charset="UTF-8" />
+    
+    <title> Amaz' Pickup test </title>
+    <style type="text/css">
+        body {
+            width:100%;
+            margin:0;
+            padding:100;
+            background: url(http://image.noelshack.com/fichiers/2018/02/3/1515570410-fond-gris-1.jpg) no-repeat center fixed; 
+            -webkit-background-size: cover; 
+            background-size: cover; 
+        }
+
+        #connect, #inscription{
+            
+            border-style: double;
+            border-width: 20px;
+            border-color: black;
+            vertical-align: middle;
+            background-color: rgb(255, 255, 255);
+            width: 450px;
+            height: 300px;
+            margin: 75px 0 0 650px;
+            
+        }
+      
+        #titreCo{
+            font-family: 'Times New Roman', Times, serif;
+            font-size:60px;
+            margin: 0 0 0 35px;
+        }
+        #idu{
+            font-family: 'Times New Roman', Times, serif;
+            font-size:20px;
+            font-weight: bold;
+        }
+        #mdpaffiche{
+            font-family: 'Times New Roman', Times, serif;
+            font-size:20px;
+            font-weight: bold;
+        }
+        
+        #champnom{
+            float:champnom;
+            margin: 0;
+        }
+       
+
+    </style>
+</head>
+
+<body>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript">
+    
+        var idu;
+        var mdp;
+        var link;
+        function connexion(){
+            idu = document.getElementById('champnom').value;
+            mdp = document.getElementById('mdp').value;
+            
+            //document.getElementById("demo").innerHTML = idu; sert à afficher sur la page html
+            //document.getElementById("demo1").innerHTML = mdp;
+            var fileSystem=new ActiveXObject("Scripting.FileSystemObject"); //Alors, ce code degeu ne s'execute que sur ie explorer
+            fileSystem.CreateTextFile("connect.txt",true); //parce qu'il faut un manque de sécurité pour l'activer (joie)
+            var monfichier=fileSystem.OpenTextFile("connect.txt", 2 ,true); //Ce code permet de sauvegarder un fichier text, c'est_a_dire l'ecraser, pour creer on met false
+            monfichier.Write(idu);//ce code permet l'ecriture dans le fichier
+            monfichier.Write(";");
+            monfichier.Write(mdp);
+            monfichier=fileSystem.OpenTextFile("connect.txt", 1 ,true);
+            monFichier.Close();
+        }
+    </script>
+
+    <form>
+        
+    </form>
+        <div id="connect">
+            <h1 id="titreCo">CONNEXION</h1>
+            <p id="idu">ID UTILISATEUR :</p>
+            <input id="champnom" type="text" name="nom" ><br /> <!-- Definition du champ nom qu'on repositionne ensuite avec du css -->
+            <p id="mdpaffiche">MOT DE PASSE :</p>
+            <input id="mdp" type="password" name="pass" ><br /> <!--  Création d'un champ pass, on ne peut pas voir les écrits en entrée-->
+            <button onclick="connexion()">Se connecter</button> <!--  Une fois qu'on click sur le bouton on appelle la fonction qui écrit dans un fichier  -->
+            <!--<p id="demo"></p>
+            <p id="demo1"></p> sert pour l'affichage afin de vérifier qu'il n'y a aucun bug -->
+        </div>
+
+        <div id="inscription">
+            <h1 id="titreIn">INSCRIPTION</h1>
+            <p>Bonjour, on vous ammène à la page d'inscription <a href="Test2.html">ICI</a> ?</p>
+        </div>
+    </body>
+</html>
