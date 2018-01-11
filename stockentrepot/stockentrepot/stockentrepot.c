@@ -63,7 +63,7 @@ float pourcentagecommandefait(Commande *demande, ArticleStocks *stockentrepot,in
 	return(pourcentagecommanderempli);
 }
 int main(int argc, char *argv[]) {
-	int quantitémanquante[6] = { 0 };
+	
 	const char *fichier;
 	
 	FILE* fichierecrit = NULL;
@@ -93,7 +93,7 @@ int main(int argc, char *argv[]) {
 		fclose(fichierCommande); // On ferme le fichierCommande qui a été ouvert
 		for (int j = 0; j < nombrelignecommande; j++)
 		{
-			printf("%d %d %d %d  \n", demande[j].ClientID, demande[j].ArticleID, demande[j].Quantity, demande[j].CodeRetrait);
+			//printf("%d %d %d %d  \n", demande[j].ClientID, demande[j].ArticleID, demande[j].Quantity, demande[j].CodeRetrait);
 		}
 	}
 	//fin ouverture fichier ici .............................................................................................s
@@ -132,17 +132,19 @@ int main(int argc, char *argv[]) {
 	int nombreentrepot = 3;
 	float tabpourcentage[6] = { 0 };
 	float max = 0;
-	int entrepotactuel = -1;
+	int tabgrand[18] = { 0 };
 	int iterate = 0;
 	int etat = 0;
 	float maxt = 0;
 	float pourcentageA=0;
 	float pourcentagerestant = 1;
 	while (etat==0){
+		int entrepotactuel = -1;
+		int quantitémanquante[6] = { 0 };
 		iterate++;
 		for (int indice1 = 0; indice1 < nombreentrepot; indice1++)
 		{
-			pourcentageA= pourcentagecommandefait(demande, stockentrepot, 6 * indice1, &quantitémanquante);
+			pourcentageA= pourcentagecommandefait(demande, stockentrepot, 6 * indice1, &quantitémanquante);		
 			tabpourcentage[indice1] = pourcentageA;
 			if (tabpourcentage[indice1]>max)
 			{
@@ -152,28 +154,41 @@ int main(int argc, char *argv[]) {
 			printf("pourcentage %f ", pourcentageA);
 			printf("indice1 %d \n", indice1);
 		}
-		for (int i = 0; i < nombrelignecommande; i++)
-		{
-			demande[i].Quantity=quantitémanquante[i];
 
-		}
 		for (int numeroentre = 0; numeroentre < 3; numeroentre++)
 		{
-			for (int i = numeroentre*6; i < (numeroentre+1)*6; i++)
+			for (int i = numeroentre * 6; i < (numeroentre + 1) * 6; i++)
 			{
-				if (numeroentre !=entrepotactuel)
-				{
+
 					stockentrepot[i].EntrepotID = stockentrepot1[i].EntrepotID;
 					stockentrepot[i].ArticleID = stockentrepot1[i].ArticleID;
 					stockentrepot[i].Quantity = stockentrepot1[i].Quantity;
 					stockentrepot[i].Hauteur = stockentrepot1[i].Hauteur;
 					stockentrepot[i].Largeur = stockentrepot1[i].Largeur;
 					stockentrepot[i].Profondeur = stockentrepot1[i].Profondeur;
-				}
 
-				
 			}
 		}
+		pourcentageA = pourcentagecommandefait(demande, stockentrepot, 6 * entrepotactuel, &quantitémanquante);
+		for (int i = 0; i < compterligne("Stock0.txt"); i++)
+		{
+
+			stockentrepot1[i].EntrepotID = stockentrepot[i].EntrepotID;
+			stockentrepot1[i].ArticleID = stockentrepot[i].ArticleID;
+			stockentrepot1[i].Quantity = stockentrepot[i].Quantity;
+			stockentrepot1[i].Hauteur = stockentrepot[i].Hauteur;
+			stockentrepot1[i].Largeur = stockentrepot[i].Largeur;
+			stockentrepot1[i].Profondeur = stockentrepot[i].Profondeur;
+
+		}
+		
+			for (int i = 0; i < nombrelignecommande; i++)
+		{
+			printf("quantité manquante %d \n", quantitémanquante[i]);
+			demande[i].Quantity=quantitémanquante[i];
+
+		}
+		
 		float ajout = max*pourcentagerestant;
 		maxt = ajout+ maxt;
 		pourcentagerestant = 1 - maxt;
@@ -201,7 +216,10 @@ int main(int argc, char *argv[]) {
 
 	
 	fichierecrit = fopen("yolo.txt","w");
-
+	for (int i = 0; i < compterligne("Stock0.txt"); i++) { //on ecrit chaque ligne jusqu'a avoir atteint le nombre de ligne du fichier
+		fprintf(fichierecrit, "%d;%d;%d;%d;%d;%d;\n", stockentrepot[i].EntrepotID, stockentrepot[i].ArticleID, stockentrepot[i].Quantity, stockentrepot[i].Hauteur, stockentrepot[i].Largeur, stockentrepot[i].Profondeur);
+	}
+	fclose(fichierecrit); //FERMETURE
 
 	system("pause");
 	return(EXIT_SUCCESS);
