@@ -1,11 +1,9 @@
-
-
-
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <conio.h>
 #include <ctype.h>
 #include <string.h>
-#include "stockentrepot.h"
+#include "Structures.h"
 #define TAILLE_MAX 128
 
 /******************************************************************************************************************************/
@@ -30,9 +28,9 @@ int lire_champ_suivant2(char *ligne, int *idx, char *champ, int taille_champ, ch
 } /* fin lire_champ_suivant() */
 
 
-  /*****************************************************************************************************************************/
-  /*---Fonction qui permet de découper une ligne d'un fichier texte en fonction d'un séparateur pour la fonction charger client*/
-  /*****************************************************************************************************************************/
+/*****************************************************************************************************************************/
+/*---Fonction qui permet de découper une ligne d'un fichier texte en fonction d'un séparateur pour la fonction charger client*/
+/*****************************************************************************************************************************/
 int lire_champ_suivant(char *ligne, int *index, char *champ, int taille_champ, char separateur)
 {
 	int index2 = 0;  //Curseur au sein du mot que l'on souhaite remplir
@@ -236,7 +234,7 @@ int init_commande(CommandeFile *commande) {
 	commande->NombreDeCommande = 0;   //On initialise le nombre de commande d'une base vide à 0
 	tmpPtr2 = (void *)malloc(COMMANDEFILE_MAX * sizeof(Commande));  //on alloue la place dans la mémoire pour le tableau
 	if (tmpPtr2 != NULL) {
-		commande->TableauDesCommandes = (Commande *)tmpPtr2;
+		commande->TableauDesCommandes = (Commande *)tmpPtr2;  
 	}
 	else return(-1);
 	errno = ChargerCommande(commande, "commande.txt"); //On charge le fichier client existant dans le tableau
@@ -249,7 +247,7 @@ int init_commande(CommandeFile *commande) {
 /**********************************************************************************************/
 int recherche(int nbrcommande, int IDClient, ClientSeul *client, ClientFile *listeclient) {
 	client = listeclient->BDDclient->head; //On initialise le client sur la tête de la liste 
-	for (int j = 0; j < nbrcommande; j++) {
+	for (int j = 0; j < nbrcommande; j++) {	
 		if (IDClient == client->client.ID) { //On regarde à quel client correspond la commande
 			return(j);		//Une fois trouvé on revoit sa position dans la liste chainée
 		}
@@ -262,15 +260,15 @@ int recherche(int nbrcommande, int IDClient, ClientSeul *client, ClientFile *lis
 /************************************************************************/
 /* Fonction qui permet de sauvegarder la commande dans le fichier voulu */
 /************************************************************************/
-int sauvegarder(CommandeFile *commande, char nom_fichier[], int i)
+int sauvegarder(CommandeFile *commande, char nom_fichier[],int i)
 {
 	FILE *fic_rep;					/* le fichier */
 	int openSucces = fopen_s(&fic_rep, nom_fichier, "a");  // On ouvre le fichier en mode "ajout" donc on écrit à la suite de ce qu'il y a dans le fichier texte
 	if (openSucces == 0) {
-		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].ClientID); fprintf(fic_rep, ";");  //on écrit ID du client et le séparateur 
-		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].ArticleID); fprintf(fic_rep, ";");	//on fait la même chose pour les autres parties
-		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].Quantity); fprintf(fic_rep, ";");
-		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].CodeRetrait); fprintf(fic_rep, ";\n");
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ClientID); fprintf(fic_rep, ";");  //on écrit ID du client et le séparateur 
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].ArticleID); fprintf(fic_rep, ";");	//on fait la même chose pour les autres parties
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].Quantity); fprintf(fic_rep, ";");
+		fprintf(fic_rep,"%04d",commande->TableauDesCommandes[i].CodeRetrait); fprintf(fic_rep, ";\n");
 	}
 	fclose(fic_rep);  // On ferme le fichier 
 	return(OK);
@@ -281,15 +279,15 @@ int sauvegarder(CommandeFile *commande, char nom_fichier[], int i)
 /* Fonction qui trie les commandes en fonction du département du client */
 /************************************************************************/
 void trie(CommandeFile *commande, ClientSeul *client, ClientFile *listeclient) {
-	int pos, departement;
+	int pos,departement;
 	char dep[2];
 	for (int i = 0; i < commande->NombreDeCommande; i++) {
 		client = listeclient->BDDclient->head;   //On initialise le client à la tête de la liste 
-		pos = recherche(commande->NombreDeCommande, commande->TableauDesCommandes[i].ClientID, client, listeclient); // on recherche la position du client dans la liste par rapport à l'ID du client qui a fait la commande
+		pos=recherche(commande->NombreDeCommande, commande->TableauDesCommandes[i].ClientID,client,listeclient); // on recherche la position du client dans la liste par rapport à l'ID du client qui a fait la commande
 		for (int k = 0; k < pos; k++) {
 			client = client->next;	//On met le pointeur client sur le client qui correspond à la commande
 		}
-		dep[0] = client->client.CodePostal[0], dep[1] = client->client.CodePostal[1]; //On isole le département 
+		dep[0] = client->client.CodePostal[0] , dep[1] = client->client.CodePostal[1]; //On isole le département 
 		departement = atoi(dep);  //On le transforme en entier
 		switch (departement) { //On trie les commandes selon leurs départements
 		case 59:
@@ -311,7 +309,7 @@ int compterligne(const char * fichierlu) {
 	int nombreligne = 0;
 	char chaine[TAILLE_MAX] = "";
 	FILE* fichiertest = NULL;
-	int ok = fopen_s(&fichiertest, fichierlu, "r");
+	int ok = fopen_s(&fichiertest,fichierlu, "r");
 
 
 	while (fgets(chaine, TAILLE_MAX, fichiertest) != NULL) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
@@ -366,7 +364,7 @@ float pourcentagecommandefait(Commande *demande, ArticleStocks *stockentrepot, i
 
 	return(pourcentagecommanderempli);
 }
-int fonction(const char *fichier, const char *comandealias,const char *fichierenvoitalias) {
+int fonction(const char *fichier, const char *comandealias) {
 
 
 	FILE* fichierenvoit = NULL;
@@ -378,7 +376,7 @@ int fonction(const char *fichier, const char *comandealias,const char *fichieren
 
 	FILE* fichiertest = NULL;
 
-	int ok1 = fopen_s(&fichiertest, fichier, "r");
+	int ok1  = fopen_s(&fichiertest,fichier, "r");
 
 	//début oubverture fichier ici............................................................................
 
@@ -386,11 +384,11 @@ int fonction(const char *fichier, const char *comandealias,const char *fichieren
 	Commande demande[TAILLE_MAX];
 	Commande demande1[TAILLE_MAX];
 	int nombrelignecommande = compterligne(comandealias);
-	int ok2 = fopen_s(&fichierCommande, comandealias, "r");
+	int ok2  = fopen_s(&fichierCommande,comandealias, "r");
 	if (fichierCommande != NULL)
 
 	{
-		for (int i = 0; i < nombrelignecommande ; i++)
+		for (int i = 0; i < nombrelignecommande-1; i++)
 		{
 			fscanf_s(fichierCommande, "%d;%d;%d;%d;", &demande[i].ClientID, &demande[i].ArticleID, &demande[i].Quantity, &demande[i].CodeRetrait);
 
@@ -398,7 +396,7 @@ int fonction(const char *fichier, const char *comandealias,const char *fichieren
 		fclose(fichierCommande); // On ferme le fichierCommande qui a été ouvert
 		for (int j = 0; j < nombrelignecommande; j++)
 		{
-			printf(" c'est moi%d %d %d %d  \n", demande[j].ClientID, demande[j].ArticleID, demande[j].Quantity, demande[j].CodeRetrait);
+			//printf("%d %d %d %d  \n", demande[j].ClientID, demande[j].ArticleID, demande[j].Quantity, demande[j].CodeRetrait);
 		}
 	}
 	//fin ouverture fichier ici .............................................................................................s
@@ -416,7 +414,7 @@ int fonction(const char *fichier, const char *comandealias,const char *fichieren
 		fclose(fichiertest); // On ferme le fichier qui a été ouvert
 		for (int j = 0; j < nombrelignestock; j++)
 		{
-			printf(" c'est toi %d %d %d %d %d %d \n", stockentrepot[j].EntrepotID, stockentrepot[j].ArticleID, stockentrepot[j].Quantity, stockentrepot[j].Hauteur, stockentrepot[j].Largeur, stockentrepot[j].Profondeur);
+			//printf(" %d %d %d %d %d %d \n", stockentrepot[j].EntrepotID, stockentrepot[j].ArticleID, stockentrepot[j].Quantity, stockentrepot[j].Hauteur, stockentrepot[j].Largeur, stockentrepot[j].Profondeur);
 
 
 		}
@@ -527,13 +525,13 @@ int fonction(const char *fichier, const char *comandealias,const char *fichieren
 	}
 
 
-	int ok3 = fopen_s(&fichierecrit, "yolo.txt", "w");
+	int ok3  = fopen_s(&fichierecrit,"yolo.txt", "w");
 	for (int i = 0; i < compterligne(fichier); i++) { //on ecrit chaque ligne jusqu'a avoir atteint le nombre de ligne du fichier
 		fprintf(fichierecrit, "%d;%d;%d;%d;%d;%d;\n", stockentrepot[i].EntrepotID, stockentrepot[i].ArticleID, stockentrepot[i].Quantity, stockentrepot[i].Hauteur, stockentrepot[i].Largeur, stockentrepot[i].Profondeur);
 	}
 	fclose(fichierecrit); //FERMETURE
-	
-	int ok4 = fopen_s(&fichierenvoit, fichierenvoitalias, "w");
+
+	int ok4   = fopen_s(&fichierenvoit,"envoit.txt", "w");
 	for (int indicecommande = 0; indicecommande < compterligne(comandealias); indicecommande++)
 	{
 
@@ -561,8 +559,8 @@ int main() {
 	CommandeFile commande;
 	init_commande(&commande);
 	trie(&commande, client, &listeclient);
-	int a = fonction("Stock0.txt", "nord.txt","envoit1.txt");
-	int b = fonction( "Stock1.txt", "pas_de_calais.txt","envoit2.txt");
+	int a =fonction("nord.txt", "Stock0.txt");
+	int b =fonction("pas_de_calais.txt", "Stock1.txt");
 	system("pause");
 	return(0);
 }
