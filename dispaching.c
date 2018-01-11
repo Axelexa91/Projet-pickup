@@ -308,7 +308,6 @@ int main() {
 	client = listeclient.BDDclient->head;
 	CommandeFile commande;
 	init_commande(&commande);
-	ChargerCommande(&commande, "commande.txt");
 	trie(&commande, client, &listeclient);
 	system("pause");
 	return(0);
