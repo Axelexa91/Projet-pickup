@@ -16,10 +16,15 @@ int main(int argc, char **argv) {
 	return(0);
 }
 
+
+/*---Fonction initialisation de la base de donnée client.*/
 int init_BDDclient(ClientFile *FichierClient)
 {
 	int errno;
 	void * tmpPtr;
+
+	/*Initilisation de la liste chainée représentant la liste chainée*/
+
 	FichierClient->NombreDeClient = 0;    //On initialise le nombredeclient d'une base vide à 0
 	tmpPtr = (void *)malloc(CLIENTFILE_MAX * sizeof(ListeClient));
 	if (tmpPtr != NULL) {
@@ -29,6 +34,8 @@ int init_BDDclient(ClientFile *FichierClient)
 		FichierClient->BDDclient->tail = NULL;   //Pareil pour la queue
 	}
 	else return(-1);
+
+	/*On utilise la fonction charger afin de pouvoir remplir la liste chainée avec les clients existants dans la base de donnée*/
 	errno = chargerclient(FichierClient, "C:\\Users\\Camille\\testLoulous\\client.txt");  //Il faut charger le fichier client existant dans la liste chainée 
 	return(0);
 }
@@ -63,8 +70,8 @@ int chargerclient(ClientFile * Fichierclient, char nom_fichier[])
 	errno_t err;
 	int nombre_client = 0;				/* index sur enregistrements */
 	int long_max_rec = sizeof(Client);
-	char buffer[sizeof(Client) + 1];
-	int index = 0;
+	char buffer[sizeof(Client) + 1];  //Tableau de caractère qui sera remplie par le fichier texte
+	int index = 0;     //Permet de savoir où l'on en est dans un mot
 	char IDtmp[5];     //Tableau servant de tampon pour récupérer l'ID en tant que chaine de caractères pour le transformer après en int
 	char *char_nw_line;
 
@@ -86,18 +93,16 @@ int chargerclient(ClientFile * Fichierclient, char nom_fichier[])
 				{
 					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
 				}
-
 				index = 0;								/* analyse depuis le debut de la ligne */
 
-				ClientSeul *nouv_element;
+				ClientSeul *nouv_element;  //On crée un élément de liste chainée qui contiendra chaque caractéristique d'une ligne du document texte
 				nouv_element = (ClientSeul *)malloc(sizeof(ClientSeul)); //On alloue au nouvel élément une place suffisante en mémoire pour contenir un enregistrement
 				nouv_element->next = NULL;
 
-				if (lire_champ_suivant(buffer, &index, IDtmp, 5, SEPARATEUR) == OK)
+				if (lire_champ_suivant(buffer, &index, IDtmp, 5, SEPARATEUR) == OK)  //Si la condition est vérifiée c'est qu'un champ d'une ligne a été lu
 				{
 					nouv_element->client.ID = atoi(IDtmp);   //On transforme la chaine de caractère en entier
 					index++;
-
 					if (lire_champ_suivant(buffer, &index, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie nom après le séparateur qu'on place dans le nouvel élément
 					{
 						index++;
@@ -167,7 +172,7 @@ int sauvegarder(ClientFile *Fichierclient, char nom_fichier[])
 			while (i < Fichierclient->NombreDeClient)
 			{
 
-				fprintf(fic_client, "%d", client->client.ID);   //A MODIFIER POUR AVOIR L'ID SUR 4 DIGITS
+				fprintf(fic_client, "%d", client->client.ID);   //Permet d'ajouter un champ dans le fichier texte
 				fputs(";", fic_client);
 				fputs(client->client.Nom, fic_client);
 				fputs(";", fic_client);
