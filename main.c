@@ -10,19 +10,14 @@
 
 int main(int argc, char **argv) {
 	print();
-	/*ClientFile ListeClient;
+	ClientFile ListeClient;
 	init_BDDclient(&ListeClient);
 	connexion(&ListeClient);
-	system("pause");*/
-	while (1) {
-		printf("loooool");
-	}
+	system("pause");
 	return(0);
 }
 
-static void print() {
-	printf("Je suis lance");
-}
+
 int init_BDDclient(ClientFile *FichierClient)
 {
 	int errno;
