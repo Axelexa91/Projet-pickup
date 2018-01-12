@@ -1,0 +1,6 @@
+﻿  stockentrepot.c
+c:\users\gauth\source\repos\stockentrepot - copie\stockentrepot\stockentrepot.c(619): warning C4244: 'fonction' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\gauth\source\repos\stockentrepot - copie\stockentrepot\stockentrepot.c(810): warning C4090: 'fonction' : qualificateurs 'const' différents
+c:\users\gauth\source\repos\stockentrepot - copie\stockentrepot\stockentrepot.c(3040): warning C4244: 'fonction' : conversion de 'time_t' en 'unsigned int', perte possible de données
+  stockentrepot.vcxproj -> C:\Users\Gauth\source\repos\stockentrepot - Copie\Debug\stockentrepot.exe
+  stockentrepot.vcxproj -> C:\Users\Gauth\source\repos\stockentrepot - Copie\Debug\stockentrepot.pdb (Partial PDB)
