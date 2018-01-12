@@ -1,0 +1,884 @@
+
+
+
+
+#include <conio.h>
+#include <ctype.h>
+#include "stockentrepot.h"
+#define TAILLE_MAX 128
+
+
+/******************************************************************************************************************************/
+/* Fonction qui permet de découper une ligne d'un fichier texte en fonction d'un séparateur pour la fonction charger commande */
+/******************************************************************************************************************************/
+int lire_champ_suivant2(char *ligne, int *idx, char *champ, int taille_champ, char separateur)
+{
+	int idx2 = 0;		//Curseur au sein du mot que l'on souhaite remplir
+	while ((idx2 < (taille_champ - 1)) && (ligne[*idx] != separateur) && (ligne[*idx] != '\0'))		//On récupère toutes les lettres contenues entre les séparateur, avec une limite de taille
+	{
+		champ[idx2] = ligne[*idx];	//La lettre est copiée dans le champ souhaité
+		idx2 += 1;
+		*idx += 1;
+	}
+	if ((ligne[*idx] == separateur) || (ligne[*idx] == '\0'))
+	{
+		champ[idx2] = 0;	/* fin de chaine sur caractere suivant */
+		return(OK);
+	}
+	else return(ERROR);		/* fin de ligne ou séparateur non atteints */
+
+} /* fin lire_champ_suivant() */
+
+
+  /*****************************************************************************************************************************/
+  /*---Fonction qui permet de découper une ligne d'un fichier texte en fonction d'un séparateur pour la fonction charger client*/
+  /*****************************************************************************************************************************/
+int lire_champ_suivant(char *ligne, int *index, char *champ, int taille_champ, char separateur)
+{
+	int index2 = 0;  //Curseur au sein du mot que l'on souhaite remplir
+	while ((index2 < (taille_champ - 1)) && (ligne[*index] != separateur))    //On récupère toutes les lettres contenues entre les séparateur, avec une limite de taille
+	{
+		champ[index2] = ligne[*index];  //La lettre est copiée dans le champ souhaité
+		index2 += 1;
+		*index += 1;
+	}
+	if ((ligne[*index] == separateur) || (ligne[*index] == '\0'))
+	{
+		champ[index2] = 0;	/* fin de chaine sur caractere suivant */
+		return(OK);
+	}
+	else return(ERROR);		/* fin de ligne ou séparateur non atteints */
+}
+
+
+/*********************************************************************************************************/
+/* Fonction qui permet de charger le fichier texte client dans la liste chainée qui contient les clients */
+/*********************************************************************************************************/
+int charger(ClientFile * Fichierclient, char nom_fichier[])
+{
+	FILE *fic_client;					/* le fichier */
+	errno_t err;
+	int nombre_client = 0;				/* index sur enregistrements */
+	int long_max_rec = sizeof(Client);
+	char buffer[sizeof(Client) + 1];
+	int index = 0;
+	char IDtmp[5];     //Tableau servant de tampon pour récupérer l'ID en tant que chaine de caractères pour le transformer après en int
+	char *char_nw_line;
+
+	_set_errno(0);
+	if ((err = fopen_s(&fic_client, nom_fichier, "r")) != 0)
+	{
+		return(err);
+	}
+	else
+	{
+		while (!feof(fic_client))
+		{
+			if (fgets(buffer, long_max_rec, fic_client) != NULL)
+			{
+				/* memorisation de l'enregistrement lu dans le tableau */
+				buffer[long_max_rec] = 0;			/* en principe il y a deja un fin_de_chaine, cf fgets */
+
+				if ((char_nw_line = strchr(buffer, '\n')) != NULL)
+				{
+					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
+				}
+
+				index = 0;								/* analyse depuis le debut de la ligne */
+
+				ClientSeul *nouv_element;
+				nouv_element = (ClientSeul *)malloc(sizeof(ClientSeul)); //On alloue au nouvel élément une place suffisante en mémoire pour contenir un enregistrement
+				nouv_element->next = NULL;
+
+				if (lire_champ_suivant(buffer, &index, IDtmp, 5, SEPARATEUR) == OK)
+				{
+					nouv_element->client.ID = atoi(IDtmp);   //On transforme la chaine de caractère en entier
+					index++;
+
+					if (lire_champ_suivant(buffer, &index, nouv_element->client.Nom, CLIENT_NOM_MAX, SEPARATEUR) == OK) //On récupère la partie nom après le séparateur qu'on place dans le nouvel élément
+					{
+						index++;
+						if (lire_champ_suivant(buffer, &index, nouv_element->client.Prenom, CLIENT_PRENOM_MAX, SEPARATEUR) == OK) // On fait la même chose pour le prénom et les autres éléments
+						{
+							index++;
+							if (lire_champ_suivant(buffer, &index, nouv_element->client.Adresse, CLIENT_ADRESSE_MAX, SEPARATEUR) == OK)
+							{
+								index++;
+								if (lire_champ_suivant(buffer, &index, nouv_element->client.Ville, CLIENT_VILLE_MAX, SEPARATEUR) == OK)
+								{
+									index++;
+									if (lire_champ_suivant(buffer, &index, nouv_element->client.CodePostal, CLIENT_CodePostal_MAX, SEPARATEUR) == OK)
+									{
+										index++;
+										if (lire_champ_suivant(buffer, &index, nouv_element->client.NumeroTel, CLIENT_TELEPHONE_MAX, SEPARATEUR) == OK)
+										{
+											index++;
+											if (lire_champ_suivant(buffer, &index, nouv_element->client.MotDePasse, CLIENT_MotDePasse_MAX, SEPARATEUR) == OK)
+											{
+												nombre_client++;
+											}
+										}
+									}
+								}
+							}
+						}
+						/* element à priori correct, on le comptabilise */
+					}
+				}
+				if (Fichierclient->BDDclient->size == 0) //Si la liste est vide on fait pointer la tête de liste sur cet élément
+				{
+					Fichierclient->BDDclient->head = nouv_element;
+					//printf("%d", nouv_element->client.ID);
+				}
+				else
+				{
+					Fichierclient->BDDclient->tail->next = nouv_element; //Si la liste est non vide on fait pointer l'élément suivant la queue de liste sur cet élément
+				}
+				Fichierclient->BDDclient->tail = nouv_element; //La queue pointe dans tous les cas sur l'élément ajouté
+				Fichierclient->BDDclient->size++;
+				Fichierclient->NombreDeClient++;
+			}
+		}fclose(fic_client);
+		return(OK);
+	}
+}
+
+
+/*******************************************************************************************************/
+/* Fonction qui permet de charger le fichier texte commande dans le tableau qui contient les commandes */
+/*******************************************************************************************************/
+int ChargerCommande(CommandeFile * commande, char nom_fichier[])
+{
+	FILE *fic_rep;					/* le fichier */
+	errno_t err;
+	int num_rec = 0;						/* index sur enregistrements */
+	int long_max_rec = 4 * sizeof(Commande);
+	char buffer[4 * sizeof(Commande) + 1];
+	int idx = 0;
+
+	char *char_nw_line;
+
+	_set_errno(0);
+	if ((err = fopen_s(&fic_rep, nom_fichier, "r")) != 0)
+	{
+		return(err);
+	}
+	else
+	{
+		while (!feof(fic_rep) && (commande->NombreDeCommande < COMMANDEFILE_MAX))
+		{
+			if (fgets(buffer, long_max_rec, fic_rep) != NULL)
+			{
+				/* memorisation de l'enregistrement lu dans le tableau */
+				buffer[long_max_rec] = 0;			/* en principe il y a deja un fin_de_chaine, cf fgets */
+
+				if ((char_nw_line = strchr(buffer, '\n')) != NULL)
+					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
+
+				idx = 0;								/* analyse depuis le debut de la ligne */
+				char mot[30]; // on crée un tableau dans lequel on récupère les chaines de caractère du fichier texte 
+
+				if (lire_champ_suivant2(buffer, &idx, mot, CLIENT_ID_MAX, SEPARATEUR) == OK) // on récupère la partie Client_ID jusqu'au séparateur puis on la place dans mot
+				{
+					idx++;
+					commande->TableauDesCommandes[num_rec].ClientID = atoi(mot);        //on transforme la chaine de caractère en entier et on l'enregistre dans le tableau de commande dans la partie ClientID
+					if (lire_champ_suivant2(buffer, &idx, mot, ARTICLE_ID_MAX, SEPARATEUR) == OK) //on fait la même chose pour toutes les autres parties
+					{
+						idx++;
+						commande->TableauDesCommandes[num_rec].ArticleID = atoi(mot);
+						if (lire_champ_suivant2(buffer, &idx, mot, QUANTITY_MAX, SEPARATEUR) == OK)
+						{
+							idx++;
+							commande->TableauDesCommandes[num_rec].Quantity = atoi(mot);
+							if (lire_champ_suivant2(buffer, &idx, mot, CODE_RETRAIT_MAX, SEPARATEUR) == OK)
+							{
+								commande->TableauDesCommandes[num_rec].CodeRetrait = atoi(mot);
+								num_rec++;
+							}
+						}
+					}
+				}
+			}
+		}
+		commande->NombreDeCommande = num_rec;
+		fclose(fic_rep);
+		return(OK);
+	}
+}
+
+
+/**********************************************************************************************************/
+/*Fonction qui intialise le nombre d’éléments à zéro, charge le fichier pour la liste chainée des clients */
+/**********************************************************************************************************/
+int init_BDDclient(ClientFile *FichierClient)
+{
+	int errno;
+	void * tmpPtr;
+	FichierClient->NombreDeClient = 0;    //On initialise le nombredeclient d'une base vide à 0
+	tmpPtr = (void *)malloc(CLIENTFILE_MAX * sizeof(ListeClient));
+	if (tmpPtr != NULL) {
+		FichierClient->BDDclient = (ListeClient*)tmpPtr;
+		FichierClient->BDDclient->head = NULL;  //Si la base de donnée est vide la tête pointe sur un élément nul
+		FichierClient->BDDclient->size = 0;
+		FichierClient->BDDclient->tail = NULL;   //Pareil pour la queue
+	}
+	else return(-1);
+	errno = charger(FichierClient, "client.txt");  //Il faut charger le fichier client existant dans la liste chainée 
+	return(0);
+}
+
+
+/******************************************************************************************************/
+/*Fonction qui intialise le nombre d’éléments à zéro, charge le fichier pour le tableau des commandes */
+/******************************************************************************************************/
+int init_commande(CommandeFile *commande) {
+	void *tmpPtr2;
+	commande->NombreDeCommande = 0;   //On initialise le nombre de commande d'une base vide à 0
+	tmpPtr2 = (void *)malloc(COMMANDEFILE_MAX * sizeof(Commande));  //on alloue la place dans la mémoire pour le tableau
+	if (tmpPtr2 != NULL) {
+		commande->TableauDesCommandes = (Commande *)tmpPtr2;
+	}
+	else return(-1);
+	errno = ChargerCommande(commande, "commande.txt"); //On charge le fichier client existant dans le tableau
+	return(0);
+}
+
+
+/**********************************************************************************************/
+/* Fonction qui permet de rechercher la position d'un client dans la liste chainé des clients */
+/**********************************************************************************************/
+int recherche(int nbrcommande, int IDClient, ClientSeul *client, ClientFile *listeclient) {
+	client = listeclient->BDDclient->head; //On initialise le client sur la tête de la liste 
+	for (int j = 0; j < nbrcommande; j++) {
+		if (IDClient == client->client.ID) { //On regarde à quel client correspond la commande
+			return(j);		//Une fois trouvé on revoit sa position dans la liste chainée
+		}
+		client = client->next; //Sinon on regarde avec le client d'après
+	}
+	return(ERROR);
+}
+
+
+/************************************************************************/
+/* Fonction qui permet de sauvegarder la commande dans le fichier voulu */
+/************************************************************************/
+int sauvegarder(CommandeFile *commande, char nom_fichier[], int i)
+{
+	FILE *fic_rep;					/* le fichier */
+	int openSucces = fopen_s(&fic_rep, nom_fichier, "a");  // On ouvre le fichier en mode "ajout" donc on écrit à la suite de ce qu'il y a dans le fichier texte
+	if (openSucces == 0) {
+		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].ClientID); fprintf(fic_rep, ";");  //on écrit ID du client et le séparateur 
+		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].ArticleID); fprintf(fic_rep, ";");	//on fait la même chose pour les autres parties
+		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].Quantity); fprintf(fic_rep, ";");
+		fprintf(fic_rep, "%04d", commande->TableauDesCommandes[i].CodeRetrait); fprintf(fic_rep, ";\n");
+	}
+	fclose(fic_rep);  // On ferme le fichier 
+	return(OK);
+}
+
+
+/************************************************************************/
+/* Fonction qui trie les commandes en fonction du département du client */
+/************************************************************************/
+void trie(CommandeFile *commande, ClientSeul *client, ClientFile *listeclient) {
+	int pos, departement;
+	char dep[2];
+	for (int i = 0; i < commande->NombreDeCommande; i++) {
+		client = listeclient->BDDclient->head;   //On initialise le client à la tête de la liste 
+		pos = recherche(commande->NombreDeCommande, commande->TableauDesCommandes[i].ClientID, client, listeclient); // on recherche la position du client dans la liste par rapport à l'ID du client qui a fait la commande
+		for (int k = 0; k < pos; k++) {
+			client = client->next;	//On met le pointeur client sur le client qui correspond à la commande
+		}
+		dep[0] = client->client.CodePostal[0], dep[1] = client->client.CodePostal[1]; //On isole le département 
+		departement = atoi(dep);  //On le transforme en entier
+		switch (departement) { //On trie les commandes selon leurs départements
+		case 59:
+			sauvegarder(commande, "nord.txt", i);
+			break;
+		case 62:
+			sauvegarder(commande, "pas_de_calais.txt", i);
+			break;
+		}
+	}
+}
+
+
+
+/**************************************************************************************/
+/*Fonction qui compte le nombre de lignes présente dans le fichier passé en paramètre */
+/**************************************************************************************/
+int compterligne(const char * fichierlu) {
+	int nombreligne = 0; //initialisation nombre de ligne
+	char chaine[TAILLE_MAX] = ""; //init de la variable qui va recevoir la ligne
+	FILE* fichiertest = NULL; //init de la varibale qui va recevoir le fichier le temps de la lecture
+
+	int ok = fopen_s(&fichiertest, fichierlu, "r"); //ouverture du fichier et stock de la réussite (ou non) de cette ouverture dans la variable "ok"              /*(INUTILE?)*/
+
+
+	while (fgets(chaine, TAILLE_MAX, fichiertest) != NULL) // On lit le fichier tant qu'on ne reçoit pas d'erreur (NULL)
+	{
+		nombreligne++;//chaque ligne lu est compter
+	}
+	fclose(fichiertest); // On ferme le fichier qui a été ouvert
+	return(nombreligne);//on renvoie le nombre de ligne compter avant d'obtenir une ligne vide (NULL)
+}
+
+/*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*Fonction qui compare le fichier commande et le fichier stock passés en paramètres(les structures sont comparées, les noms de fichiers servent a connaitre leurs tailles) afin de renvoyer le pourcentage de la commande accompli par ce stock. Nécéssite de passer un tableau "quantité manquante" afin de pouvoir tester quel entrepot rempli le reste de la commande dans le cas ou le premier ne le fais pas*/
+/*****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+float pourcentagecommandefait(Commande *demande, ArticleStocks *stockentrepot, int indiceentrepot, int(*quantitémanquante)[6], const char *fichier, const char *comandealias) {
+	int taillefile = compterligne(comandealias); //dertermine la taille du fichier commande
+	int taillestock = compterligne(fichier);//determine la taille du fichier stock
+	int totalarticlecommande = 0;//initialisation variable du total d'articles dans la commande
+	int totalarticlemanquant = 0;//init variable des articles manquant après la première comparaison
+	float pourcentagecommanderempli = 0;//init du pourcentage de commmande total rempli
+
+	//%de remplisage
+
+	for (int indicecommande = 0; indicecommande < taillefile; indicecommande++) //Pour chaque commande
+	{
+		totalarticlecommande = demande[indicecommande].Quantity + totalarticlecommande; //on ajoute le nombre d'article de cette commande au total d'articles de toutes les commandes
+		for (int indicestock = indiceentrepot; indicestock <indiceentrepot + 6; indicestock++) //Pour chauqu'un des stocks
+		{
+
+
+			if (demande[indicecommande].ArticleID == stockentrepot[indicestock].ArticleID) //Si on trouve l'article demandé
+			{
+
+
+				if (demande[indicecommande].Quantity > stockentrepot[indicestock].Quantity) //Et qu'on en a pas assé pour remplir la demande de cet article de suite
+				{
+
+
+					(*quantitémanquante)[indicecommande] = demande[indicecommande].Quantity - stockentrepot[indicestock].Quantity; //On ajoute la différence a la quantité manquante de cette demande
+					totalarticlemanquant = (*quantitémanquante)[indicecommande] + totalarticlemanquant; //Et on ajoute au total d'article manquant cette difference
+					stockentrepot[indicestock].Quantity = 0; //De plus l'entrepot est considéré comme vide pour les prochaines commande qui seront comparées
+
+				}
+				else { //Si on a assez d'article pour satisfaire la demande de cet article
+
+					(*quantitémanquante)[indicecommande] = 0; //Il ne nous manque rien pour l'instant
+					stockentrepot[indicestock].Quantity = stockentrepot[indicestock].Quantity - demande[indicecommande].Quantity; //Le stock de cet entrepot est considéré comme débité pour les autres comparaison de commandes
+
+				}
+
+
+			}
+		}
+	}
+	pourcentagecommanderempli = (1 - ((float)totalarticlemanquant / (float)totalarticlecommande)); //Une fois toutes les comparaisons faites, on calcul le pourcentage de commandes rempli
+	printf("%d %d %d", totalarticlemanquant, totalarticlecommande, indiceentrepot);
+
+	return(pourcentagecommanderempli); //on renvoie le pourcentage de commandes rempli
+}
+
+/**********/
+/*fonction*/
+/**********/
+int fonction(const char *fichier, const char *comandealias,const char *fichierenvoitalias) {
+
+
+	FILE* fichierenvoit = NULL;//initialisations variable qui stock les fichiers
+	FILE* fichierecrit = NULL;
+	ArticleStocks stockentrepot[18];//initialisations des structures qui vont stocker les informations
+	ArticleStocks stockentrepot1[18];
+
+	int nombrelignestock = compterligne(fichier);//detection du nombre de ligne dans le fichier
+
+	FILE* fichiertest = NULL;//init variable stockage fichier
+
+	int ok1 = fopen_s(&fichiertest, fichier, "r");//ouverture du fichier stock dans la variable fichier test et stockage de la reussite dans la variable ok1
+
+	//début oubverture fichier ici............................................................................
+
+	FILE* fichierCommande = NULL; //init variable stockage fichier
+	Commande demande[TAILLE_MAX];//init des structures qui vont contenir les informations
+	Commande demande1[TAILLE_MAX];
+	int nombrelignecommande = compterligne(comandealias);//detection du nombre de ligne dans la commande
+	int ok2 = fopen_s(&fichierCommande, comandealias, "r"); //ouverture du fichier commandealias dans la variable fichier commande et stockage de la reussie dans ok2
+	if (fichierCommande != NULL) //si le fichier commande a bien ete ouvert
+
+	{
+		for (int i = 0; i < nombrelignecommande ; i++) //pour chaque ligne de commande
+		{
+			fscanf_s(fichierCommande, "%d;%d;%d;%d;", &demande[i].ClientID, &demande[i].ArticleID, &demande[i].Quantity, &demande[i].CodeRetrait); //lecture de la ligne et placement dans une structure
+
+		}
+
+		fclose(fichierCommande); // On ferme le fichierCommande qui a été ouvert
+
+		for (int j = 0; j < nombrelignecommande; j++) //affichage de chacune des lignes
+		{
+			printf(" c'est moi%d %d %d %d  \n", demande[j].ClientID, demande[j].ArticleID, demande[j].Quantity, demande[j].CodeRetrait);
+		}
+	}
+	//fin ouverture fichier ici .............................................................................................s
+
+	if (fichiertest != NULL) //si le fichier stocks a ete ouvert
+
+	{
+		for (int i = 0; i < nombrelignestock; i++) //pour chaque ligne des stocks
+		{
+
+
+			fscanf_s(fichiertest, "%d;%d;%d;%d;%d;%d;", &stockentrepot[i].EntrepotID, &stockentrepot[i].ArticleID, &stockentrepot[i].Quantity, &stockentrepot[i].Hauteur, &stockentrepot[i].Largeur, &stockentrepot[i].Profondeur); //lecture de la ligne et stockage dans une structure
+
+		}
+
+		fclose(fichiertest); // On ferme le fichier qui a été ouvert
+
+		for (int j = 0; j < nombrelignestock; j++)//affichage de chaque ligne
+		{
+			printf(" c'est toi %d %d %d %d %d %d \n", stockentrepot[j].EntrepotID, stockentrepot[j].ArticleID, stockentrepot[j].Quantity, stockentrepot[j].Hauteur, stockentrepot[j].Largeur, stockentrepot[j].Profondeur);
+
+
+		}
+
+	}
+	for (int i = 0; i < nombrelignestock; i++) //pour chaque ligne de stock on fait une copie des structures des stocks
+	{
+
+		stockentrepot1[i].EntrepotID = stockentrepot[i].EntrepotID;
+		stockentrepot1[i].ArticleID = stockentrepot[i].ArticleID;
+		stockentrepot1[i].Quantity = stockentrepot[i].Quantity;
+		stockentrepot1[i].Hauteur = stockentrepot[i].Hauteur;
+		stockentrepot1[i].Largeur = stockentrepot[i].Largeur;
+		stockentrepot1[i].Profondeur = stockentrepot[i].Profondeur;
+
+	}
+	for (int i = 0; i < compterligne(comandealias); i++) //ici aussi
+	{
+
+		demande1[i].Quantity = demande[i].Quantity;
+
+	}
+	// pourcentiration
+	int nombreentrepot = 3; //initialisation de variables ; nombre d'entrepot
+	float tabpourcentage[6] = { 0 }; //le tableau contenant le pourcentage de completion de la commande total de chaque entrepot
+	float max = 0; //variable contenant le pourcentages le plus grand
+	int tabgrand[18] = { 0 };//
+	int iterate = 0;//variable contenant l'iteration du while pour le bidouiller en for
+	int etat = 0;//variable d'arret de la boucle while
+	float maxt = 0; //le pourcentage de commandes rempli
+	float pourcentageA = 0; //uun pourcentage
+	float pourcentagerestant = 1;//le pourcentage restant a remplir de la commande actuel
+	while (etat == 0) { 
+		int entrepotactuel = -1; //indice de l'entrepot dans lequel on se trouve, initialisé a "aucun"
+		int quantitémanquante[6] = { 0 }; //initialisation des quantité manquante
+		iterate++; //increment pour arreter le while au bout d'un certain temps
+		for (int indice1 = 0; indice1 < nombreentrepot; indice1++) //Pour chaqu'un des entrepots
+		{
+			pourcentageA = pourcentagecommandefait(demande, stockentrepot, 6 * indice1, &quantitémanquante, fichier, comandealias); //comparaison avec un entrepot
+			tabpourcentage[indice1] = pourcentageA; //stockage du pourcentage accompli par cet entrpot
+			if (tabpourcentage[indice1]>max) //si cet entrpot rempli plus qu'un  precedant
+			{
+				max = tabpourcentage[indice1]; //on remplace le meilleurs taux de completion
+				entrepotactuel = indice1; //ainsi que l'entrepot qui le rempli
+			}
+			printf("pourcentage %f ", pourcentageA);//affichage du pourcentage rempli par le meilleur entrpot
+			printf("indice1 %d \n", indice1); //et qual entrpot c'est
+		}
+
+		for (int numeroentre = 0; numeroentre < 3; numeroentre++) //pour chaque entrepot
+		{
+			for (int i = numeroentre * 6; i < (numeroentre + 1) * 6; i++)//on remplace les stocks reel avec les nouveau
+			{
+
+				stockentrepot[i].EntrepotID = stockentrepot1[i].EntrepotID;
+				stockentrepot[i].ArticleID = stockentrepot1[i].ArticleID;
+				stockentrepot[i].Quantity = stockentrepot1[i].Quantity;
+				stockentrepot[i].Hauteur = stockentrepot1[i].Hauteur;
+				stockentrepot[i].Largeur = stockentrepot1[i].Largeur;
+				stockentrepot[i].Profondeur = stockentrepot1[i].Profondeur;
+
+			}
+		}
+		pourcentageA = pourcentagecommandefait(demande, stockentrepot, 6 * entrepotactuel, &quantitémanquante, fichier, comandealias); //mise a jour du pourcentage
+		for (int i = 0; i < compterligne(fichier); i++)//pour chaque ligne du fichier de stock on fait une copie des structures
+		{
+
+			stockentrepot1[i].EntrepotID = stockentrepot[i].EntrepotID;
+			stockentrepot1[i].ArticleID = stockentrepot[i].ArticleID;
+			stockentrepot1[i].Quantity = stockentrepot[i].Quantity;
+			stockentrepot1[i].Hauteur = stockentrepot[i].Hauteur;
+			stockentrepot1[i].Largeur = stockentrepot[i].Largeur;
+			stockentrepot1[i].Profondeur = stockentrepot[i].Profondeur;
+
+		}
+
+		for (int i = 0; i < nombrelignecommande; i++)//pour chaque commande on affiche la quantité manquante
+		{
+			printf("quantité manquante %d \n", quantitémanquante[i]);
+			demande[i].Quantity = quantitémanquante[i];
+
+		}
+
+		float ajout = max*pourcentagerestant; //on calcul le pourcentage de ocmmande total accompli ors de cet iteration des comparaison
+		maxt = ajout + maxt; //on les ajoute au pourcentage total accompli jusque là
+		pourcentagerestant = 1 - maxt;// on met a jour le pourcentage de commande a realiser ( dans un autre stock cette fois)
+		printf("pourcentagerestant %f \n", pourcentagerestant);
+		printf("ajout %f \n", ajout);
+		printf("max %f \n", max);
+		printf("maxt %f \n", maxt);
+
+
+		if (entrepotactuel == -1)//si aucun entrepot n'a pu completer ne serais-ce qu'un peu la commande alors c'est la rupture de stock et la commande ne peut etre completer
+		{
+			etat = 1;
+			printf("c'est la merde");
+		}
+		else if (max * 100 == 100) // si le pourcentage atteint 100 pourcent alors c'est bon
+		{
+			etat = 1;
+			printf("on est bon mon chou");
+		}
+		else if (iterate == 5) { //pour s'arreter et s'empecher de tourner en boucle infini
+			etat = 1;
+			printf("stop c'est un for");
+		}
+		max = 0;
+	}
+
+
+	int ok3 = fopen_s(&fichierecrit, "yolo.txt", "w"); //ouverture du fichier que l'on souhaite ecrire et stockage de la reussite dans une variable
+	for (int i = 0; i < compterligne(fichier); i++) { //on ecrit chaque ligne jusqu'a avoir atteint le nombre de ligne du fichier
+		fprintf(fichierecrit, "%d;%d;%d;%d;%d;%d;\n", stockentrepot[i].EntrepotID, stockentrepot[i].ArticleID, stockentrepot[i].Quantity, stockentrepot[i].Hauteur, stockentrepot[i].Largeur, stockentrepot[i].Profondeur);
+	}
+	fclose(fichierecrit); //FERMETURE
+	
+	int ok4 = fopen_s(&fichierenvoit, fichierenvoitalias, "w");//ouverture du fichier que l'on souhaite envoyer et stockage de la reussite dans une variable
+	for (int indicecommande = 0; indicecommande < compterligne(comandealias); indicecommande++) //pour chaque ligne de la commande effectuée
+	{
+
+		for (int indicestock = 0; indicestock < 6; indicestock++) //pour chaque stock (puisqu'on sais qu'on a tout maintenant)
+		{
+
+
+			if (demande[indicecommande].ArticleID == stockentrepot[indicestock].ArticleID)//si on trouve l'article demandé
+			{
+				fprintf(fichierenvoit, "%d;%d;%d;%d;%d;\n", stockentrepot[indicestock].ArticleID, demande1[indicecommande].Quantity, stockentrepot[indicestock].Hauteur, stockentrepot[indicestock].Largeur, stockentrepot[indicestock].Profondeur); //on l'insere dans le fichier qui sera envoyer
+			}
+		}
+	}
+	fclose(fichierecrit); //FERMETURE
+	system("pause");
+	return(EXIT_SUCCESS);
+}
+
+
+
+/*ecrase un fichier*/
+void clear_fichier(char nom_fichier[]) {
+	FILE *fic_rep; // le fichier 
+		int openSucces = fopen_s(&fic_rep, nom_fichier, "w");
+	fclose(fic_rep);
+}
+
+
+
+
+/**********************************************************************/
+/*                          Initialisation                            */
+/**********************************************************************/
+
+/*Cette fonction est activée à chaque début de fuseaux des 4h ainsi qu'à chaque nouvelle exécution.
+Elle permet de créer un tableau dans lequel sera contenu toutes les commandes effectuées durant les 4h.
+Elle permet égalemnt d'initialiser le tableau avant de charger le contenu du fichier vente appelé "commande".*/
+int init_tableau_commandes(CommandeFile* AllCommandes) {
+	void*Ptr = (void*)malloc(COMMANDEFILE_MAX * sizeof(Commande)); //Créer un tableau
+	if (Ptr != NULL) {
+		AllCommandes->TableauDesCommandes = Ptr;
+		AllCommandes->NombreDeCommande = 0;
+		return OK;
+	}
+	else return ERROR;
+}
+
+/*Cette fonction est activée à chaque nouvelle Commande entrée par l'utilisateur.
+Elle permet de créer un tableau dans lequel sera contenu la commande en question
+contenue dans le fichier FichierAchat.*/
+int init_Commande(Commande* Com) {
+	Com->ArticleID = 0;
+	Com->ClientID = 0;
+	Com->CodeRetrait = 0;
+	Com->Quantity = 0;
+	return OK;
+}
+
+
+/*Cette fonction est activée lors de la connexion du client ou après la validation du panier.
+Elle permet d'initialiser le panier dans lequel sera disposer ses commandes éventuels.*/
+int init_panier(CommandeFile* Panier) {
+	void* Ptr = (void*)malloc(ARTICLEFILE_MAX * sizeof(Commande));
+	if (Ptr != NULL) {
+		Panier->TableauDesCommandes = Ptr;
+		Panier->NombreDeCommande = 0;
+		return OK;
+	}
+	else return ERROR;
+}
+
+/**********************************************************************/
+/*                      Fonctions du panier                           */
+/**********************************************************************/
+
+/*Cette fonction permet d'ajouter une nouvelle commande au panier du client.*/
+int ajout_panier(CommandeFile *Panier, int ID_client, int ID_article, int quantite) {
+
+	// Création d'une nouvelle commande
+	Commande nouvelarticle;
+
+	nouvelarticle.ArticleID = ID_article;
+	nouvelarticle.ClientID = ID_client;
+	nouvelarticle.Quantity = quantite;
+	srand(time(NULL));							// Cette fonction permet de générer un nombre aléatoire
+	nouvelarticle.CodeRetrait = rand() % 10000;	// différent à chaque éxécution
+
+												// Ajout de la commande au panier
+	*(Panier->TableauDesCommandes + Panier->NombreDeCommande) = nouvelarticle;
+	(Panier->NombreDeCommande)++;
+	return OK;
+}
+
+/* Cette fonction permet de supprimer une commande du panier*/
+int supprimer_dans_panier(CommandeFile *Panier, int indice) {
+	for (int i = indice + 1; i <COMMANDEFILE_MAX; i++) {
+		*(Panier->TableauDesCommandes + i - 1) = *(Panier->TableauDesCommandes + i);
+	}
+	Panier->NombreDeCommande--;
+	return OK;
+}
+
+/* Cette fonction permet de valider la totalité du panier, les commandes seront alors définitives.*/
+int validation_panier(CommandeFile* AllCommandes, CommandeFile* Panier) {
+
+	//Ajout du panier au tableau de toutes les commandes des 4h
+	for (int indice = 0; indice < Panier->NombreDeCommande; indice++) {
+		*(AllCommandes->TableauDesCommandes + AllCommandes->NombreDeCommande + indice) = *(Panier->TableauDesCommandes + indice);
+	}
+
+	// Mise à 0 du panier
+	AllCommandes->NombreDeCommande += Panier->NombreDeCommande;
+	init_panier(Panier);
+
+	return(OK);
+}
+
+/*Cette fonction sera activée au bout des fuseaux de 4h elle permettra de mettre à 0 le fichier vente et de sauvegarder
+les commandes de ces 4 dernières heures dans celui-ci.*/
+int envoi_commandes(CommandeFile *AllCommandes, char nom_fichier[]) {
+
+	FILE *fic_rep;					/* le fichier */
+
+	if ((fopen_s(&fic_rep, nom_fichier, "w")) != 0) {
+		// Ouverture du fichier possédant le nom compris dans nom_fichier si il existe sinon création d'un fichier possédant ce nom
+		// Mode d'utilisation "w" = write (écrire uniquement)
+		// Si la fonction fopen_s renvoie autre chose que 0 cela signifie qu'elle n'a pas fonctionnée
+		return(ERROR);
+	}
+	else { // si la fonction fopen_s a fonctionnée
+		for (int i = 0; i < AllCommandes->NombreDeCommande; i++) {
+			fprintf_s(fic_rep, "%04d;%04d;%04d;%04d;\n", (AllCommandes->TableauDesCommandes + i)->ClientID, (AllCommandes->TableauDesCommandes + i)->ArticleID, (AllCommandes->TableauDesCommandes + i)->Quantity, (AllCommandes->TableauDesCommandes + i)->CodeRetrait);
+			// on affiche dans le fichier chaque élément de toutes les commandes
+		}
+		fclose(fic_rep); // On ferme le fichier qui a été ouvert
+		return(OK);
+	}
+
+}
+
+/**********************************************************************/
+/*                      Fonctions charger                             */
+/**********************************************************************/
+
+
+/*Charge le fichier vente*/
+int charger_fichier_vente(CommandeFile* Fichier, char nom_fichier[])
+{
+
+	FILE *fic_rep;
+	errno_t err;
+	int num_rec = 0;						/* index sur enregistrements */
+	int long_max_rec = 4 * (sizeof(Commande));
+	char buffer[4 * (sizeof(Commande) + 1)];
+	int idx = 0;
+
+	char *char_nw_line;
+
+	_set_errno(0);
+	if ((err = fopen_s(&fic_rep, nom_fichier, "r")) != 0) // si il y a une erreur lors de l'ouverture du fichier
+														  // ouverture du fichier en mode "r" = read (lire uniquement)
+	{
+		return(ERROR);
+	}
+	else
+	{
+		while (!feof(fic_rep) && (Fichier->NombreDeCommande < COMMANDEFILE_MAX))
+		{
+			if (fgets(buffer, long_max_rec, fic_rep) != NULL)
+			{
+				buffer[long_max_rec] = 0;			/* en principe il y a deja un fin_de_chaine, cf fgets */
+
+				if ((char_nw_line = strchr(buffer, '\n')) != NULL)
+					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
+
+				char mot[10];
+				idx = 0; /* analyse depuis le debut de la ligne */
+
+
+				if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+				{
+					idx++;							/* on saute le separateur */
+					Fichier->TableauDesCommandes[num_rec].ClientID = atoi(mot);
+					if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+					{
+						idx++;							/* on saute le separateur */
+						Fichier->TableauDesCommandes[num_rec].ArticleID = atoi(mot);
+						if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+						{
+							idx++;							/* on saute le separateur */
+							Fichier->TableauDesCommandes[num_rec].Quantity = atoi(mot);
+							if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+							{
+								Fichier->TableauDesCommandes[num_rec].CodeRetrait = atoi(mot);
+								num_rec++;		/* element à priori correct, on le comptabilise */
+							}
+						}
+					}
+				}
+			}
+		}
+		Fichier->NombreDeCommande = num_rec;
+		fclose(fic_rep);
+		return(OK);
+	}
+}
+
+
+
+
+/*Charge le fichier Achat*/
+Commande charger_fichier_achat(Commande New, char nom_fichier[])
+{
+
+	FILE *fic_rep;
+	errno_t err;
+	int long_max_rec = 4 * (sizeof(Commande));
+	char buffer[4 * (sizeof(Commande) + 1)];
+	int idx = 0;
+
+	char *char_nw_line;
+
+	_set_errno(0);
+	if ((err = fopen_s(&fic_rep, nom_fichier, "r")) != 0) // si il y a une erreur lors de l'ouverture du fichier
+														  // ouverture du fichier en mode "r" = read (lire uniquement)
+	{
+		return(New);
+	}
+	else
+	{
+		while (!feof(fic_rep))
+		{
+			if (fgets(buffer, long_max_rec, fic_rep) != NULL)
+			{
+				buffer[long_max_rec] = 0;			/* en principe il y a deja un fin_de_chaine, cf fgets */
+
+				if ((char_nw_line = strchr(buffer, '\n')) != NULL)
+					*char_nw_line = '\0';			/* suppression du fin_de_ligne eventuel */
+
+				char mot[10];
+				idx = 0; /* analyse depuis le debut de la ligne */
+
+
+				if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+				{
+					idx++;							/* on saute le separateur */
+					New.ClientID = atoi(mot);
+					if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+					{
+						idx++;							/* on saute le separateur */
+						New.ArticleID = atoi(mot);
+						if (lire_champ_suivant(buffer, &idx, mot, 5, SEPARATEUR) == OK)
+						{
+							New.Quantity = atoi(mot);
+
+						}
+					}
+				}
+			}
+		}
+		fclose(fic_rep);
+		return(New);
+	}
+}
+
+/* fin charger */
+
+
+/**********************************************************************/
+/*                      Fonction principale                           */
+/**********************************************************************/
+
+int Gestion_Achat(const char *FichierAchat) {
+	CommandeFile AllCommandes; // Contient toutes les commandes des 4h
+	CommandeFile Panier; // Contient toutes les commandes effectués par un client durant son achat
+	Commande NewAchat;
+	init_panier(&Panier);
+	init_tableau_commandes(&AllCommandes);
+	init_Commande(&NewAchat);
+	charger_fichier_vente(&AllCommandes, "commande.txt");
+	NewAchat = charger_fichier_achat(NewAchat, FichierAchat);
+	ajout_panier(&Panier, NewAchat.ClientID, NewAchat.ArticleID, NewAchat.Quantity);
+	validation_panier(&AllCommandes, &Panier);
+	envoi_commandes(&AllCommandes, "commande.txt");
+	return 1;
+}
+// On suppose a<b
+
+
+int rand_a_b(int a, int b) {
+
+	return rand() % (b - a) + a;
+
+}
+
+/*cree un delai*/
+void mysleep(unsigned int tempsDelais)
+{
+	time_t tempsFin = time(NULL) + (time_t)tempsDelais;
+	for (; time(NULL) < tempsFin; );
+}
+
+int main() {
+	clear_fichier("commande.txt");//nettoie le fichier de commande
+	for  (int i = 0;  i < 5;  i++)
+	{
+		int d = rand_a_b(0, 5);//generation aleatoire
+		int e = rand_a_b(0, 6);
+		int f = rand_a_b(1, 20);
+		mysleep(1);
+		srand(time(NULL));//re-init de la fonction rand()
+		FILE *fic_repachats; // le fichier 
+		int openSucces = fopen_s(&fic_repachats, "achat.txt", "w"); //ouverture
+		fprintf(fic_repachats, "%d;%d;%d;\n", d,e,f); //ecriture
+		fclose(fic_repachats);//fermeture
+		
+		int c = Gestion_Achat("achat.txt");
+		clear_fichier("achat.txt");
+	}
+	
+
+	clear_fichier("nord.txt"); //nettoie les fichier de commande par region
+	clear_fichier("pas_de_calais.txt");
+	ClientFile listeclient;
+	init_BDDclient(&listeclient);
+	ClientSeul *client;
+	client = listeclient.BDDclient->head;
+	CommandeFile commande;
+	init_commande(&commande);
+	trie(&commande, client, &listeclient);
+	int a = fonction("Stock0.txt", "nord.txt","envoit1.txt");
+	int b = fonction( "Stock1.txt", "pas_de_calais.txt","envoit2.txt");
+	system("pause");
+	return(0);
+}
